@@ -1,6 +1,6 @@
-## nail-polish-db Schema draft
+# nail-polish-db Schema draft
 
-### polishes
+## polishes
 
 - polish_idx
 - brand_idx (FK)
@@ -14,7 +14,7 @@
 - recd_date
 - destash_flag
 
-### brands
+## brands
 
 - brand_idx
 - type
@@ -22,7 +22,7 @@
 - num_owned
 - num_destashed
 
-### order-log
+## order-log
 
 - order_date
 - order_idx
@@ -38,7 +38,7 @@
 - total_spent
 - cost_per_polish
 
-### mani-log
+## mani-log
 
 - mani_idx
 - mani_date
@@ -46,7 +46,7 @@
 - tags
 - mani_photos
 
-### ingredient-library
+## ingredient-library
 
 - product_name
 - ingredient_type
@@ -57,9 +57,9 @@
 - order_date (FK)
 - recipes (FK)
 
-### custom-polish-recipes
+## custom-polish-recipes
 
-- polish_name 
+- polish_name
 - ingredients
 - qtys
 - notes
