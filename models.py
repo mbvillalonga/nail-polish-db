@@ -1,7 +1,7 @@
 import os
 from flask import Flask
 from flask_sqlalchemy import SQLAlchemy
-from datetime import datetime
+from flask_migrate import Migrate
 from sqlalchemy.orm import DeclarativeBase
 from dotenv import load_dotenv
 
@@ -29,6 +29,7 @@ app.config['SQLALCHEMY_DATABASE_URI'] = f'mysql://{DB_USER}:{DB_PASSWORD}@{DB_HO
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 
 db.init_app(app)
+migrate = Migrate(app, db) # enable flask-migrate
 
 # Brands table (basics, no relationships)
 class Brands(db.Model):
