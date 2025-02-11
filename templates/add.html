@@ -1,0 +1,17 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <title>Add a New Polish</title>
+</head>
+<body>
+    <h1>Add a New Polish</h1>
+    <form method="POST">
+        <label>Name: <input type="text" name="name" required></label><br>
+        <label>Brand: <input type="text" name="brand" required></label><br>
+        <label>Color: <input type="text" name="color" required></label><br>
+        <label>Full description: <input type="text" name="full_desc" required></label><br>
+        <button type="submit">Add Polish</button>
+    </form>
+    <a href="{{ url_for('index') }}">Back to Collection</a>
+</body>
+</html>

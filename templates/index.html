@@ -1,0 +1,15 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <title>Nail Polish Collection</title>
+</head>
+<body>
+    <h1>Nail Polish Collection</h1>
+    <a href="{{ url_for('add') }}">Add a New Polish</a>
+    <ul>
+        {% for polish in polishes %}
+            <li>{{ polish.brand }} - {{ polish.name }} ({{ polish.color }}; {{ polish.full_desc }})</li>
+        {% endfor %}
+    </ul>
+</body>
+</html>
