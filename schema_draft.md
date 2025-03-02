@@ -1,28 +1,37 @@
 # nail-polish-db Schema draft
 
-## polishes
+## Abbreviations
 
-- polish_idx
-- brand_idx (FK)
+- FK: foreign key
+
+## Tables
+
+### `brands` (class: `Brand`)
+
+- brand_id
+- name
 - type
-- color_group
-- tags
-- swatch_photo
+- website_url
+
+### `polishes` (class: `Polish`)
+
+- polish_id
+- name
+- brand_id (FK)
+- polish_type
+- color_family
 - full_desc
+- tags
+- swatch_photos (FK)
 - mani_photos (FK)
-- usage_amt
 - recd_date
 - destash_flag
 
-## brands
+### `swatch_photos` (class: `SwatchPhoto`)
 
-- brand_idx
-- type
-- website_url
-- num_owned
-- num_destashed
+### `mani_photos` (class: `ManiPhoto`)
 
-## order-log
+### `order_logs` (class: `OrderLog`)
 
 - order_date
 - order_idx
@@ -38,7 +47,7 @@
 - total_spent
 - cost_per_polish
 
-## mani-log
+### `mani_logs` (class: `ManiLog`)
 
 - mani_idx
 - mani_date
@@ -46,7 +55,7 @@
 - tags
 - mani_photos
 
-## ingredient-library
+### `ingredients` (class: `Ingredient`)
 
 - product_name
 - ingredient_type
@@ -57,9 +66,29 @@
 - order_date (FK)
 - recipes (FK)
 
-## custom-polish-recipes
+### `recipes` (class: `Recipe`)
 
 - polish_name
 - ingredients
 - qtys
 - notes
+
+## Relationships
+
+### One-to-one relationships
+
+1. `recipes` to `polishes` DONE
+
+### One-to-many relationships
+
+1. `brands` (one) to `polishes` (many) DONE
+2. `polishes` (one) to `swatch_photos` (many) DONE
+3. `mani_logs` (one) to `mani_photos` (many) DONE
+
+### Many-to-many relationships
+
+1. `polishes` to `order_logs` DONE
+2. `polishes` to `mani_photos` DONE
+3. `polishes` to `mani_logs` DONE
+4. `ingredients` to `order_logs` DONE
+5. `ingredients` to `recipes` DONE
