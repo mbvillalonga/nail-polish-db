@@ -202,7 +202,7 @@ class Polish(db.Model):
         lazy="dynamic",
     )
     # Polishes to mani logs: many-to-many
-    mani_logs = relationship(
+    mani_log = relationship(
         "ManiLog",
         secondary=polishes_mani_logs,
         back_populates="polish",

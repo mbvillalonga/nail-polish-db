@@ -1,7 +1,7 @@
 # app.py
 # Set up a basic route to display polish inventory and add new records.
 
-from flask import render_template, request, redirect, url_for
+from flask import Flask,render_template, request, redirect, url_for
 from models import db, Polish, app
 
 
