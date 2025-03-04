@@ -16,6 +16,7 @@ ENV/
 env.bak/
 venv.bak/
 
-# Ignore MySQL dumps
+# Ignore MySQL dumps and personal data
 backup.sql
 *.db
+my_data/
