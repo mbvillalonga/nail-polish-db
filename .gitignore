@@ -20,3 +20,6 @@ venv.bak/
 backup.sql
 *.db
 my_data/
+
+# Ignore .DS_Store
+.DS_Store

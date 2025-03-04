@@ -8,11 +8,11 @@ with app.app_context():
     # Disable foreign key checks temporarily 
     db.session.execute(text("SET FOREIGN_KEY_CHECKS=0;"))
 
-    # Delete child table entries before parent tables
-    db.session.execute(text("DELETE FROM polishes_order_logs;"))  # ✅ Clear many-to-many join table
-    db.session.execute(text("DELETE FROM polishes_mani_logs;"))  # ✅ Clear join table for manicures
-    db.session.execute(text("DELETE FROM ingredients_recipes;"))  # ✅ Clear recipe-ingredient links
-    db.session.execute(text("DELETE FROM ingredients_order_logs;"))  # ✅ Clear ingredient orders
+    # Delete child table entries before parent tables (association tables)
+    db.session.execute(text("DELETE FROM polishes_order_logs;"))  
+    db.session.execute(text("DELETE FROM polishes_mani_logs;"))  
+    db.session.execute(text("DELETE FROM ingredients_recipes;"))  
+    db.session.execute(text("DELETE FROM ingredients_order_logs;")) 
 
     # Delete parent records
     db.session.query(SwatchPhoto).delete()
