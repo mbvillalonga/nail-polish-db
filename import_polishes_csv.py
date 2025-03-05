@@ -43,6 +43,7 @@ with app.app_context():
             # Format order date field
             order_date = row.get("Order Date","").strip()
             order_date = datetime.strptime(order_date, "%m/%d/%y").date() if order_date else None
+            # REFORMAT AS YYYY-MM-DD to match with order_log
             #print(order_date)
             
             ## ------------ Info for Polishes ------------

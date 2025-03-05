@@ -16,6 +16,7 @@ with app.app_context():
             # mani_name = row.get("Name","").strip() # Add this in later with text formatting steps
             mani_date_str = row.get("Date","").strip()
             mani_date = datetime.strptime(mani_date_str, "%m/%d/%y").date() if mani_date_str else None
+            # add reformatting of date so that it is yyyy-mm-dd
             mani_tags = row.get("Tags","").strip() # Need to add to model
             mani_polishes_raw = row.get("Polish(es) used","").strip().split(",") # Cleans imported text
             mani_polishes = {polish_name.strip() for polish_name in mani_polishes_raw} # Cleans imported text
