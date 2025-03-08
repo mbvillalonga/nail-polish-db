@@ -20,3 +20,4 @@ venv.bak/
 backup.sql
 *.db
 my_data/
+.DS_Store
