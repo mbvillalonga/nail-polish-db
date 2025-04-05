@@ -2,8 +2,26 @@
 <html lang="en">
 <head>
     <title>Nail Polish Collection</title>
+    <style>
+        .success {
+            background-color: #e0ffe0;
+            border: 1px solid #7fd47f;
+            padding: 10px;
+            margin-bottom: 10px;
+            border-radius: 4px;
+        }
+    </style>
 </head>
 <body>
+    {% with messages = get_flashed_messages() %}
+        {% if messages %}
+            <ul class="flashes">
+        {% for message in messages %}
+            <li>{{ message }}</li>
+        {% endfor %}
+            </ul>
+        {% endif %}
+    {% endwith %}
     <h1>Nail Polish Collection</h1>
     <h2>UNDER CONSTRUCTION - I am using this page to test various features.</h2>
     <p><a href="{{ url_for('add') }}">Add a New Polish</a></p>

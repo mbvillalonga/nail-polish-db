@@ -1,39 +1,14 @@
-import os
-from flask import Flask
 from flask_sqlalchemy import SQLAlchemy
 from flask_migrate import Migrate
 from sqlalchemy.orm import DeclarativeBase, relationship
-from dotenv import load_dotenv
-
-# load env variables
-load_dotenv()
-
-# initialize a new Flask web app
-app = Flask(__name__)
-
-# retrieve database credentials from .env file
-DB_USER = os.getenv("DB_USER")
-DB_PASSWORD = os.getenv("DB_PASSWORD")
-DB_HOST = os.getenv("DB_HOST")
-DB_NAME = os.getenv("DB_NAME")
-
-# connect Flask to MySQL and disable object modification tracking
-app.config["SQLALCHEMY_DATABASE_URI"] = (
-    f"mysql+mysqlconnector://{DB_USER}:{DB_PASSWORD}@{DB_HOST}/{DB_NAME}"
-)
-app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
-
 
 # pass subclass of DeclarativeBase
 class Base(DeclarativeBase):
     pass
 
-
 # create the db object
 db = SQLAlchemy(model_class=Base)
-
-db.init_app(app)  # initalize db
-migrate = Migrate(app, db)  # enable flask-migrate
+migrate = Migrate()
 
 ## Associative tables (for many-to-many relationships)
 
@@ -345,8 +320,3 @@ class Ingredient(db.Model):
         back_populates="ingredient",
         lazy="dynamic",
     )
-
-
-if __name__ == "__main__":
-    with app.app_context():
-        db.create_all()

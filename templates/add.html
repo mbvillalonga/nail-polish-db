@@ -2,16 +2,69 @@
 <html lang="en">
 <head>
     <title>Add a New Polish</title>
+    <style>
+        .success {
+            background-color: #e0ffe0;
+            border: 1px solid #7fd47f;
+            padding: 10px;
+            margin-bottom: 10px;
+            border-radius: 4px;
+        }
+    </style>
 </head>
 <body>
+    {% with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}
+            <ul class="flashes">
+        {% for category, message in messages %}
+            <li class="{{ category }}">{{ message }}</li>
+        {% endfor %}
+            </ul>
+        {% endif %}
+    {% endwith %}
     <h1>Add a New Polish</h1>
     <form method="POST">
-        <label>Name: <input type="text" name="name" required></label><br>
-        <label>Brand: <input type="text" name="brand" required></label><br>
-        <label>Color: <input type="text" name="color" required></label><br>
-        <label>Full description: <input type="text" name="full_desc" required></label><br>
+        <label for="name">Polish name:</label><br>
+        <input type="text" id="name" name="name" required><br><br>
+
+        <label for="polish_type">Polish Type:</label><br>
+        <select id="polish_type" name="polish_type" required>
+            <option value="color">Color</option>
+            <option value="top coat">Top Coat</option>
+            <option value="base coat">Base Coat</option>
+            <option value="stamping polish">Stamping Polish</option>
+            <option value="other">Other</option>
+        </select><br><br>
+
+        <label for="brand">Brand:</label><br>
+        <select name="brand" id="brand" onchange="toggleNewBrandField()" required>
+            {% for brand in brands %}
+                <option value="{{ brand.id }}">{{ brand.name }}</option>
+            {% endfor %}
+            <option value="new">-- Add New Brand --</option>
+        </select><br><br>
+
+        <div id="new-brand-container" style="display:none;">
+            <label for="new_brand">New Brand Name:</label><br>
+            <input type="text" name="new_brand" id="new_brand"><br><br>
+        </div>  
+
+        <label for="color_family">Color family:</label><br> 
+        <input type="text" id="color_family" name="color_family" required><br><br>
+
+        <label for="full_desc">Full description:</label><br>
+        <textarea id="full_desc" name="full_desc" rows="3" cols="40"></textarea><br><br>
+
         <button type="submit">Add Polish</button>
     </form>
     <a href="{{ url_for('index') }}">Back to Collection</a>
+
+    <script>
+        function toggleNewBrandField() {
+            const brandSelect = document.getElementById("brand");
+            const newBrandContainer = document.getElementById("new-brand-container");
+            newBrandContainer.style.display = (brandSelect.value === "new") ? "block" : "none";
+        }
+    </script>
 </body>
 </html>
