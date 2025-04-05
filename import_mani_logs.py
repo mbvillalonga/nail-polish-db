@@ -8,7 +8,6 @@ from datetime import datetime
 IMPORT_FILE = os.getenv("FILENAME_IMPORT_MANIS")
 
 def smart_split(csv_string):
-    import csv
     return next(csv.reader([csv_string], skipinitialspace=True))
 
 with app.app_context():
@@ -34,7 +33,7 @@ with app.app_context():
 
             tags = row.get("Tags","").strip() # Need to add to model
 
-            mani_polishes_raw = row.get("Polishes","").strip() # Cleans imported text
+            mani_polishes_raw = row.get("Polish(es) used","").strip() # Cleans imported text
             mani_polishes = {name.strip() for name in smart_split(mani_polishes_raw)} # Cleans imported text
             
             photo_paths_raw = row.get("Pic","").strip() # Cleans imported text
