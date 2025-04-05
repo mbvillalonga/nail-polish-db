@@ -1,9 +1,11 @@
-# app.py
-# Set up a basic route to display polish inventory and add new records.
-
-from flask import Flask,render_template, request, redirect, url_for
+from flask import Flask, render_template, request, redirect, url_for
 from models import db, Polish, app
 
+"""
+app.py
+Set up a basic route to display polish inventory and add new records.
+Mercedes Villalonga, 2025
+"""
 
 # Home route for displaying all polishes
 @app.route("/")
@@ -33,6 +35,11 @@ def add():
 
     return render_template("add.html")  # displays the add.html form
 
+# Route for displaying all polishes and info: brand, color, etc.
+@app.route("/polishes")
+def view_polishes():
+    polishes = Polish.query.order_by(Polish.name).all()
+    return render_template("polishes.html", polishes=polishes)
 
 if __name__ == "__main__":
     app.run(debug=True)  # starts the Flask development server for testing

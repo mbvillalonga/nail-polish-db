@@ -1,0 +1,33 @@
+<!-- templates/polishes.html -->
+ <!DOCTYPE html>
+ <html lang="en">
+    <head>
+        <meta charset="UTF-8">
+        <title>All Polishes</title>
+    </head>
+    <body>
+        <h1>All Polishes</h1>
+        
+        <p><a href="{{ url_for('index') }}">Back to Home</a></p>
+
+        <table border="1" cellpadding="8">
+            <tr>
+                <th>Name</th>
+                <th>Brand</th>
+                <th>Color</th>
+                <th>Description</th>
+                <!-- add tags-->
+            </tr>
+            {% for polish in polishes %}
+            <tr>
+                <td>{{ polish.name }}</td>
+                <td>{{ polish.brand.name if polish.brand else "-" }}</td>
+                <td>{{ polish.color_family or "-" }}</td>
+                <td>{{ polish.full_desc or "-" }}</td>
+            </tr>
+            {% endfor %}
+        </table>
+
+        <p><a href="{{ url_for('index') }}">Back to Home</a></p>
+    </body>
+ </html>
