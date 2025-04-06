@@ -9,9 +9,9 @@ It allows users to log polishes, record purchases, and track usage.
 
 This project serves two purposes:
 
-1. **Personal use**: I use this app to maintain my own collection
+1. **Personal use**: I use this app to maintain my own collection.
 
-2. **Open source demo**: The code is available for others to explore or modify
+2. **Open source demo**: The code is available for others to explore or modify.
 
 ## Features
 
@@ -89,6 +89,8 @@ nail-polish-db/
 |-- templates/          # Folder for HTML templates
     |-- index.html      # Home page for displaying polishes
     |-- add.html        # Form to add new polish
+    |-- add-mani.html   # Form to add new mani log entry
+    |-- polishes.html   # List of all polishes
 |-- static/             # For CSS/images for front end
 |-- .env.example        # Template for credentials (see next step)
 |-- venv/               # Virtual environment (not included in repo)
@@ -102,7 +104,13 @@ nail-polish-db/
 
 ## Future improvements
 
-**UNDER CONSTRUCTION**
+### Polish list
+
+- Tags for easy filtering by finish, colors, etc.: Create a many-to-many relationship
+
+### Manicure log
+
+- Include a way to specify type of manicure for accuracy of usage statistics
 
 ## Screenshots
 

@@ -1,7 +1,5 @@
 from flask import Flask, render_template, request, redirect, url_for, flash
-#from flask_migrate import Migrate
-#from flask_sqlalchemy import SQLAlchemy
-from models import db, migrate, Polish, Brand
+from models import db, migrate, Polish, Brand, Tag
 from dotenv import load_dotenv
 import os
 
@@ -54,7 +52,19 @@ def create_app():
             color_family = request.form["color_family"].strip() # extract color
             full_desc = request.form.get("full_desc", "").strip() # extract description
             polish_type = request.form["polish_type"]
-            tags = request.form.get("tags","").strip()
+            #tags = request.form.get("tags","").strip()
+
+            # tags
+            tag_names = request.form.get("tags", "").split(",")
+            tag_names = [t.strip().lower() for t in tag_names if t.strip()] #
+            tags = []
+
+            for name in tag_names:
+                tag = Tag.query.filter_by(name=name).first()
+                if not tag:
+                    tag = Tag(name=name)
+                    db.session.add(tag)
+                tags.append(tag)
 
             # select brand
             if selected_brand == "new" and new_brand_input:
@@ -75,7 +85,7 @@ def create_app():
                     brand_id=brand.id, 
                     color_family=color_family, 
                     full_desc=full_desc,
-                    tags=tags
+                    tag=tags
                 )  
                 db.session.add(new_polish)  # save to table
                 db.session.commit()

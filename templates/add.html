@@ -55,6 +55,9 @@
         <label for="full_desc">Full description:</label><br>
         <textarea id="full_desc" name="full_desc" rows="3" cols="40"></textarea><br><br>
 
+        <label for="tags">Tags (comma-separated):</label><br>
+        <input type="text" id="tags" name="tags" placeholder="e.g. shimmer, flakies, jelly"><br><br>
+
         <button type="submit">Add Polish</button>
     </form>
     <a href="{{ url_for('index') }}">Back to Collection</a>

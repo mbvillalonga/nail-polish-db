@@ -39,6 +39,13 @@ polishes_mani_logs = db.Table(
     ),
 )
 
+# `polishes` to `tags`
+polishes_tags = db.Table(
+    "polishes_tags",
+    db.Column("polish_id", db.Integer, db.ForeignKey("polishes.id"), primary_key=True),
+    db.Column("tag_id", db.Integer, db.ForeignKey("tags.id"), primary_key=True),
+)
+
 # `ingredients` to `order_logs`
 ingredients_order_logs = db.Table(
     "ingredients_order_logs",
@@ -60,7 +67,6 @@ ingredients_recipes = db.Table(
 )
 
 ## Main tables
-
 
 # class: Brand
 # creates `brands` table
@@ -142,7 +148,6 @@ class Polish(db.Model):
     )
     color_family = db.Column(db.String(50))
     full_desc = db.Column(db.String(400))
-    tags = db.Column(db.String(255))  # comma-separated list
     # eventually add:
     # destash_flag (single-select, can remain blank)
 
@@ -182,6 +187,14 @@ class Polish(db.Model):
         secondary=polishes_mani_logs,
         back_populates="polish",
         lazy="dynamic",
+    )
+
+    # Polishes to tags: many-to-many
+    tag = relationship(
+        "Tag",
+        secondary=polishes_tags,
+        back_populates="polish",
+        lazy="dynamic"
     )
 
 
@@ -319,4 +332,22 @@ class Ingredient(db.Model):
         secondary=ingredients_recipes,
         back_populates="ingredient",
         lazy="dynamic",
+    )
+
+class Tag(db.Model):
+    __tablename__ = "tags"
+
+    # Primary key
+    id = db.Column(db.Integer, primary_key=True)
+
+    # Core field
+    name = db.Column(db.String(50), unique=True, nullable=False)
+
+    # Relationships
+    # tags to polishes: many-to-many
+    polish = db.relationship(
+        "Polish",
+        secondary=polishes_tags,
+        back_populates="tag",
+        lazy="dynamic"
     )
