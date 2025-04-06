@@ -59,10 +59,10 @@ def create_app():
             tag_names = [t.strip().lower() for t in tag_names if t.strip()] #
             tags = []
 
-            for name in tag_names:
-                tag = Tag.query.filter_by(name=name).first()
+            for tag_name in tag_names:
+                tag = Tag.query.filter_by(name=tag_name).first()
                 if not tag:
-                    tag = Tag(name=name)
+                    tag = Tag(name=tag_name)
                     db.session.add(tag)
                 tags.append(tag)
 

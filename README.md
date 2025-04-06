@@ -110,6 +110,10 @@ nail-polish-db/
   - Added to models.py: 4/6/25
   - Added to app.py: 4/6/25
 
+### Edit route and form
+
+- Implement a way to edit individual records in the Flask app, in case of data entry errors.
+
 ### Polish list
 
 - Tags for easy filtering by finish, colors, etc.: Create a many-to-many relationship
