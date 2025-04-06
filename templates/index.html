@@ -2,15 +2,7 @@
 <html lang="en">
 <head>
     <title>Nail Polish Collection</title>
-    <style>
-        .success {
-            background-color: #e0ffe0;
-            border: 1px solid #7fd47f;
-            padding: 10px;
-            margin-bottom: 10px;
-            border-radius: 4px;
-        }
-    </style>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
 </head>
 <body>
     {% with messages = get_flashed_messages() %}

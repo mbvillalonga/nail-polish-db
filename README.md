@@ -104,6 +104,12 @@ nail-polish-db/
 
 ## Future improvements
 
+### Tags
+
+- A table that stores tags used to categorize polishes, manicures, ingredients. Useful for filtering and grouping.
+  - Added to models.py: 4/6/25
+  - Added to app.py: 4/6/25
+
 ### Polish list
 
 - Tags for easy filtering by finish, colors, etc.: Create a many-to-many relationship

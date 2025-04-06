@@ -3,6 +3,7 @@
  <html lang="en">
     <head>
         <meta charset="UTF-8">
+        <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
         <title>All Polishes</title>
     </head>
     <body>
@@ -16,7 +17,7 @@
                 <th>Brand</th>
                 <th>Color</th>
                 <th>Description</th>
-                <!-- add tags-->
+                <th>Tags</th>
             </tr>
             {% for polish in polishes %}
             <tr>
@@ -24,6 +25,13 @@
                 <td>{{ polish.brand.name if polish.brand else "-" }}</td>
                 <td>{{ polish.color_family or "-" }}</td>
                 <td>{{ polish.full_desc or "-" }}</td>
+                <td>
+                    {% for tag in polish.tag %}
+                        <span class="tag-label">{{ tag.name }}</span>
+                    {% else %}
+                        <em>No tags</em>
+                    {% endfor %}
+                </td>
             </tr>
             {% endfor %}
         </table>

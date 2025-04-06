@@ -1,0 +1,16 @@
+.tag-label {
+    background-color: #FFCCFF;
+    border-radius: 4px;
+    padding: 2px 6px;
+    margin-right: 4px;
+    font-size: 0.9em;
+    display: inline-block;
+}
+
+.success {
+    background-color: #e0ffe0;
+    border: 1px solid #7fd47f;
+    padding: 10px;
+    margin-bottom: 10px;
+    border-radius: 4px;
+}

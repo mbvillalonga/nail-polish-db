@@ -46,6 +46,13 @@ polishes_tags = db.Table(
     db.Column("tag_id", db.Integer, db.ForeignKey("tags.id"), primary_key=True),
 )
 
+# `mani_logs` to `tags`
+mani_logs_tags = db.Table(
+    "mani_logs_tags",
+    db.Column("mani_log_id", db.Integer, db.ForeignKey("mani_logs.id"), primary_key=True),
+    db.Column("tag_id", db.Integer, db.ForeignKey("tags.id"), primary_key=True),
+)
+
 # `ingredients` to `order_logs`
 ingredients_order_logs = db.Table(
     "ingredients_order_logs",
@@ -299,6 +306,14 @@ class ManiLog(db.Model):
         back_populates="mani_log",
         lazy="dynamic",
     )
+    # mani_logs to tags: many-to-many
+        # tags to mani_logs: many-to-many
+    tag = db.relationship(
+        "Tag",
+        secondary=mani_logs_tags,
+        back_populates="mani_log",
+        lazy="dynamic"
+    )
 
 
 # class: Ingredient
@@ -348,6 +363,14 @@ class Tag(db.Model):
     polish = db.relationship(
         "Polish",
         secondary=polishes_tags,
+        back_populates="tag",
+        lazy="dynamic"
+    )
+
+    # tags to mani_logs: many-to-many
+    mani_log = db.relationship(
+        "ManiLog",
+        secondary=mani_logs_tags,
         back_populates="tag",
         lazy="dynamic"
     )
