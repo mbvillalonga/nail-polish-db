@@ -16,6 +16,7 @@
     {% endwith %}
     <h1>Add a New Polish</h1>
     <form method="POST">
+
         <label for="name">Polish name:</label><br>
         <input type="text" id="name" name="name" required><br><br>
 
@@ -41,8 +42,25 @@
             <input type="text" name="new_brand" id="new_brand"><br><br>
         </div>  
 
-        <label for="color_family">Color family:</label><br> 
-        <input type="text" id="color_family" name="color_family" required><br><br>
+        <label for="color_family">Color Family</label>
+        <select name="color_family" id="color_family">
+            <option value="">-- Select Color Family --</option>
+            <option value="clear/white">Clear / White</option>
+            <option value="black">Black</option>
+            <option value="grey/silver">Grey / Silver</option>
+            <option value="nude/gold/brown">Nude / Gold / Brown</option>
+            <option value="red">Red</option>
+            <option value="coral/orange">Coral / Orange</option>
+            <option value="yellow">Yellow</option>
+            <option value="green">Green</option>
+            <option value="teal/turq/aqua">Teal / Turquoise / Aqua</option>
+            <option value="blue">Blue</option>
+            <option value="indigo">Indigo</option>
+            <option value="violet">Violet</option>
+            <option value="fuchsia">Fuchsia</option>
+            <option value="pink">Pink</option>
+            <option value="base/top coats">Base / Top Coat</option>
+        </select><br><br>
 
         <label for="full_desc">Full description:</label><br>
         <textarea id="full_desc" name="full_desc" rows="3" cols="40"></textarea><br><br>

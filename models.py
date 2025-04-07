@@ -143,17 +143,20 @@ class Polish(db.Model):
     name = db.Column(db.String(150), nullable=False)
     polish_type = db.Column(
         db.Enum(
-            "color",
-            "top coat",
-            "base coat",
-            "stamping polish",
-            "other",
+            "color", "top coat", "base coat", "stamping polish", "other",
             name="polish_types",
-            nullable=False,
-            default="color",
-        )
+        ),
+        nullable=True,
     )
-    color_family = db.Column(db.String(50))
+    color_family = db.Column(
+        db.Enum(
+            "clear/white", "black", "grey/silver", "nude/gold/brown",
+            "red","coral/orange","yellow","green","teal/turq/aqua",
+            "blue","indigo","violet","fuchsia","pink","base/top coat",
+            name="color_family_types",
+        ),
+        nullable=True
+    )
     full_desc = db.Column(db.String(400))
     destashed_flag = db.Column(db.Boolean, default=False, nullable=False)
 

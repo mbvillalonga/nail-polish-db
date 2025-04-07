@@ -45,16 +45,34 @@ def create_app():
         brands = Brand.query.order_by(Brand.name).all()
 
         if request.method == "POST":  # when user submits the form:
-            name = request.form["name"].strip()  # extract name
+            name = request.form["name"].strip()  # extract polish name
+
+            # brand
             selected_brand = request.form["brand"]
             new_brand_input = request.form.get("new_brand", "").strip()
-    #        brand_name = request.form["brand"]  # extract brand
-            color_family = request.form["color_family"].strip() # extract color
-            full_desc = request.form.get("full_desc", "").strip() # extract description
-            polish_type = request.form["polish_type"]
-            #tags = request.form.get("tags","").strip()
 
-            # tags
+            if selected_brand == "new" and new_brand_input:
+                brand = Brand.query.filter_by(name=new_brand_input).first()
+                if not brand:
+                    brand = Brand(name=new_brand_input, type="unknown")
+                    db.session.add(brand)
+                    db.session.commit()
+            else:
+                brand = Brand.query.filter_by(id=int(selected_brand)).first()
+
+            if not brand:
+                flash("Brand could not be determined.", "error")
+                return redirect(url_for("add_polish"))
+
+            color_family = request.form.get("color_family") # extract color
+            if color_family == "":
+                color_family = None
+
+            full_desc = request.form.get("full_desc", "").strip() # extract description
+
+            polish_type = request.form["polish_type"] # extract polish type
+
+            # extract tags
             tag_names = request.form.get("tags", "").split(",")
             tag_names = [t.strip().lower() for t in tag_names if t.strip()] #
             tags = []
@@ -66,18 +84,9 @@ def create_app():
                     db.session.add(tag)
                 tags.append(tag)
 
-            # select brand
-            if selected_brand == "new" and new_brand_input:
-                brand = Brand.query.filter_by(name=new_brand_input).first()
-                if not brand:
-                    brand = Brand(name=new_brand_input, type="unknown")
-                    db.session.add(brand)
-                    db.session.commit()
-            else:
-                brand = Brand.query.filter_by(id=int(selected_brand)).first()
-            
             # check if polish exists for this brand 
             existing = Polish.query.filter_by(name=name, brand_id=brand.id).first()
+
             if not existing:
                 new_polish = Polish( # create new record
                     name=name, 
@@ -89,8 +98,10 @@ def create_app():
                 )  
                 db.session.add(new_polish)  # save to table
                 db.session.commit()
-                flash(f"Added polish: {new_polish.name} by {brand.name}", "success")
+                flash(f"Polish added: {new_polish.name} by {brand.name}", "success")
+
             return redirect(url_for("index"))  # return to home page
+        
         return render_template("add.html", brands=brands)  # displays the add.html form
 
     # Route for displaying all polishes and info: brand, color, etc.
