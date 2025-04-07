@@ -16,15 +16,19 @@
                 <th>Name</th>
                 <th>Brand</th>
                 <th>Color</th>
-                <th>Description</th>
                 <th>Tags</th>
+                <th>Description</th>
             </tr>
             {% for polish in polishes %}
             <tr>
-                <td>{{ polish.name }}</td>
+                <td>
+                    {{ polish.name }}
+                    {% if polish.destashed_flag %}
+                        <span class="destash-label">Destashed</span>
+                    {% endif %}
+                </td>
                 <td>{{ polish.brand.name if polish.brand else "-" }}</td>
                 <td>{{ polish.color_family or "-" }}</td>
-                <td>{{ polish.full_desc or "-" }}</td>
                 <td>
                     {% for tag in polish.tag %}
                         <span class="tag-label">{{ tag.name }}</span>
@@ -32,6 +36,7 @@
                         <em>No tags</em>
                     {% endfor %}
                 </td>
+                <td>{{ polish.full_desc or "-" }}</td>
             </tr>
             {% endfor %}
         </table>

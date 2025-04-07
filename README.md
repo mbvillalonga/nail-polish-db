@@ -4,18 +4,18 @@
 
 ## Overview
 
-This is a Flask-based MySQL database designed to track a personal nail polish collection.
-It allows users to log polishes, record purchases, and track usage.
+This is a Flask-based MySQL database designed to track a personal cosmetics collection.
+It allows users to catalogue items, record purchases, and track usage.
 
 This project serves two purposes:
 
-1. **Personal use**: I use this app to maintain my own collection.
+1. **Personal use**: I use this app to maintain my own nail polish collection.
 
 2. **Open source demo**: The code is available for others to explore or modify.
 
 ## Features
 
-- Store and manage lists of polishes and brands
+- Store and manage lists of nail polishes and brands
 - Store and manage lists of custom lacquer recipes and ingredients
 - Record purchase history and track usage
 - Web-based interface with an HTML front end using Flask
@@ -116,7 +116,9 @@ nail-polish-db/
 
 ### Polish list
 
-- Tags for easy filtering by finish, colors, etc.: Create a many-to-many relationship
+- Tags for easy filtering by finish, colors, etc.: Create a many-to-many relationship (done: 4/6/25)
+- Convert `color_family` attribute from string to single-select drop-down
+- Add a destashed attribute
 
 ### Manicure log
 

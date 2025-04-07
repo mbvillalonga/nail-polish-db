@@ -155,8 +155,7 @@ class Polish(db.Model):
     )
     color_family = db.Column(db.String(50))
     full_desc = db.Column(db.String(400))
-    # eventually add:
-    # destash_flag (single-select, can remain blank)
+    destashed_flag = db.Column(db.Boolean, default=False, nullable=False)
 
     # Foreign keys (to linked parent tables)
     recipe_id = db.Column(
