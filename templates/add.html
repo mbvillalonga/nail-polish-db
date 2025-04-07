@@ -18,16 +18,16 @@
     <form method="POST">
 
         <label for="name">Polish name:</label><br>
-        <input type="text" id="name" name="name" required><br><br>
+        <input type="text" id="name" name="name" required><br><br><br>
 
-        <label for="polish_type">Polish Type:</label><br>
+        <label for="polish_type">Polish type:</label><br>
         <select id="polish_type" name="polish_type" required>
             <option value="color">Color</option>
             <option value="top coat">Top Coat</option>
             <option value="base coat">Base Coat</option>
             <option value="stamping polish">Stamping Polish</option>
             <option value="other">Other</option>
-        </select><br><br>
+        </select><br><br><br>
 
         <label for="brand">Brand:</label><br>
         <select name="brand" id="brand" onchange="toggleNewBrandField()" required>
@@ -35,14 +35,14 @@
                 <option value="{{ brand.id }}">{{ brand.name }}</option>
             {% endfor %}
             <option value="new">-- Add New Brand --</option>
-        </select><br><br>
+        </select><br><br><br>
 
         <div id="new-brand-container" style="display:none;">
-            <label for="new_brand">New Brand Name:</label><br>
-            <input type="text" name="new_brand" id="new_brand"><br><br>
+            <label for="new_brand">New brand name:</label><br>
+            <input type="text" name="new_brand" id="new_brand"><br><br><br>
         </div>  
 
-        <label for="color_family">Color Family</label>
+        <label for="color_family">Color family:</label><br>
         <select name="color_family" id="color_family">
             <option value="">-- Select Color Family --</option>
             <option value="clear/white">Clear / White</option>
@@ -60,15 +60,15 @@
             <option value="fuchsia">Fuchsia</option>
             <option value="pink">Pink</option>
             <option value="base/top coats">Base / Top Coat</option>
-        </select><br><br>
+        </select><br><br><br>
 
         <label for="full_desc">Full description:</label><br>
-        <textarea id="full_desc" name="full_desc" rows="3" cols="40"></textarea><br><br>
+        <textarea id="full_desc" name="full_desc" rows="3" cols="40"></textarea><br><br><br>
 
         <label for="tags">Tags (comma-separated):</label><br>
-        <input type="text" id="tags" name="tags" placeholder="e.g. shimmer, flakies, jelly"><br><br>
+        <input type="text" id="tags" name="tags" placeholder="e.g. shimmer, flakies, jelly"><br><br><br>
 
-        <button type="submit">Add Polish</button>
+        <button type="submit">Add Polish</button><br><br><br>
     </form>
     <a href="{{ url_for('index') }}">Back to Collection</a>
 
