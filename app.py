@@ -1,4 +1,4 @@
-from flask import Flask, render_template, request, redirect, url_for, flash
+from flask import Flask, render_template, request, redirect, url_for, flash, send_from_directory
 from models import db, migrate, Polish, Brand, Tag
 from dotenv import load_dotenv
 import os
@@ -109,6 +109,11 @@ def create_app():
     def view_polishes():
         polishes = Polish.query.order_by(Polish.name).all()
         return render_template("polishes.html", polishes=polishes)
+
+    # Route for accessing my data
+    @app.route("/my_data/<path:filename>")
+    def serve_my_data(filename):
+        return send_from_directory("my_data", filename)
 
     return app
 

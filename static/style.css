@@ -23,3 +23,17 @@
     font-size: 0.6rem;
     margin-left: 0.5rem;
 }
+
+.thumbnail {
+    width: 117px;
+    height: 88px;
+    object-fit: cover;
+    border: 1px solid #ccc;
+    margin: 3px;
+}
+
+.swatch-gallery {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+}

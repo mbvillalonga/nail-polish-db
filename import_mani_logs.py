@@ -1,11 +1,15 @@
 import csv
 import os
 import re
-from models import db, app, ManiLog, Polish, ManiPhoto
+from models import db, ManiLog, Polish, ManiPhoto
 from datetime import datetime
+from app import create_app
 
 # Get path and filename for import from .env file
 IMPORT_FILE = os.getenv("FILENAME_IMPORT_MANIS")
+
+# Create the Flask app and push the app context
+app = create_app()
 
 def smart_split(csv_string):
     return next(csv.reader([csv_string], skipinitialspace=True))
