@@ -1,6 +1,7 @@
 from flask import Flask, render_template, request, redirect, url_for, flash, send_from_directory
 from models import db, migrate, Polish, Brand, Tag
 from dotenv import load_dotenv
+from sqlalchemy import and_, or_
 import os
 
 """
@@ -107,8 +108,59 @@ def create_app():
     # Route for displaying all polishes and info: brand, color, etc.
     @app.route("/polishes")
     def view_polishes():
-        polishes = Polish.query.order_by(Polish.name).all()
-        return render_template("polishes.html", polishes=polishes)
+        #polishes = Polish.query.order_by(Polish.name).all()
+        #return render_template("polishes.html", polishes=polishes)
+    
+        polishes_query = Polish.query
+
+        # Get filter parameters
+        brand_ids = request.args.getlist("brand_id")
+        colors = request.args.getlist("color_family")
+        types = request.args.getlist("polish_type")
+        tag_ids = request.args.getlist("tag")
+        tag_logic = request.args.get("tag_logic", "or")
+        destashed_only = request.args.get("destashed")
+
+        # Apply filters dynamically
+        if brand_ids:
+            polishes_query = polishes_query.filter(Polish.brand_id.in_(brand_ids))
+
+        if colors:
+            polishes_query = polishes_query.filter(Polish.color_family.in_(colors))
+
+        if types:
+            polishes_query = polishes_query.filter(Polish.polish_type.in_(types))
+
+        if destashed_only:
+            polishes_query = polishes_query.filter_by(destashed_flag=True)
+
+        if tag_ids:
+            tag_ids = [int(tid) for tid in tag_ids]
+
+            if tag_logic == "and":
+                for tag_id in tag_ids:
+                    polishes_query = polishes_query.filter(Polish.tag.any(Tag.id == tag_id))
+            else:
+                polishes_query = polishes_query.filter(Polish.tag.any(Tag.id.in_(tag_ids)))
+
+        polishes = polishes_query.order_by(Polish.name).all()
+
+        # Pass data needed for filter form dropdowns
+        all_brands = Brand.query.order_by(Brand.name).all()
+        all_tags = Tag.query.order_by(Tag.name).all()
+
+        color_families = list(Polish.color_family.property.columns[0].type.enums)
+        polish_types = list(Polish.polish_type.property.columns[0].type.enums)
+
+        return render_template(
+            "polishes.html",
+            polishes=polishes,
+            all_brands=all_brands,
+            all_tags=all_tags,
+            color_families=color_families,
+            polish_types=polish_types,
+            request=request,
+        )
 
     # Route for accessing my data
     @app.route("/my_data/<path:filename>")

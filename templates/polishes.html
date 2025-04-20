@@ -1,6 +1,6 @@
 <!-- templates/polishes.html -->
- <!DOCTYPE html>
- <html lang="en">
+<!DOCTYPE html>
+<html lang="en">
     <head>
         <meta charset="UTF-8">
         <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
@@ -14,6 +14,46 @@
         <h1>All Polishes</h1>
         
         <p><a href="{{ url_for('index') }}">Back to Home</a></p>
+
+        <form method="get">
+            <label for="brand_id">Brands:</label>
+            <select name="brand_id" multiple>
+                {% for brand in all_brands %}
+                <option value="{{ brand.id }}" {% if brand.id|string in request.args.getlist('brand_id') %}selected{% endif %}>{{ brand.name }}</option>
+                {% endfor %}
+            </select>
+
+            <label for="color_family">Color Families:</label>
+            <select name="color_family" multiple>
+                {% for color in color_families %}
+                <option value="{{ color }}" {% if color in request.args.getlist('color_family') %}selected{% endif %}>{{ color }}</option>
+                {% endfor %}
+            </select>
+
+            <label for="polish_type">Polish Types:</label>
+            <select name="polish_type" multiple>
+                {% for ptype in polish_types %}
+                <option value="{{ ptype }}" {% if ptype in request.args.getlist('polish_type') %}selected{% endif %}>{{ ptype }}</option>
+                {% endfor %}
+            </select>
+
+            <label for="tag">Tags:</label>
+            <select name="tag" multiple>
+                {% for tag in all_tags %}
+                <option value="{{ tag.id }}" {% if tag.id|string in request.args.getlist('tag') %}selected{% endif %}>{{ tag.name }}</option>
+                {% endfor %}
+            </select>
+
+            <label>Tag logic:</label>
+            <select name="tag_logic">
+                <option value="or" {% if request.args.get('tag_logic') == 'or' %}selected{% endif %}>Match any</option>
+                <option value="and" {% if request.args.get('tag_logic') == 'and' %}selected{% endif %}>Match all</option>
+            </select>
+
+            <label><input type="checkbox" name="destashed" value="1" {% if request.args.get('destashed') %}checked{% endif %}/> Show only destashed</label>
+
+            <button type="submit">Apply Filters</button>
+        </form>
 
         <table border="1" cellpadding="8">
             <tr>
@@ -29,16 +69,16 @@
                 <td>
                     {{ polish.name }}
                     {% if polish.destashed_flag %}
-                        <span class="destash-label">Destashed</span>
+                    <span class="destash-label">Destashed</span>
                     {% endif %}
                 </td>
                 <td>{{ polish.brand.name if polish.brand else "-" }}</td>
                 <td>{{ polish.color_family or "-" }}</td>
                 <td>
                     {% for tag in polish.tag %}
-                        <span class="tag-label">{{ tag.name }}</span>
+                    <span class="tag-label">{{ tag.name }}</span>
                     {% else %}
-                        <em>No tags</em>
+                    <em>No tags</em>
                     {% endfor %}
                 </td>
                 <td>{{ polish.full_desc or "-" }}</td>
@@ -46,14 +86,8 @@
                     {% if polish.swatch_photo %}
                     <div class="swatch-gallery">
                         {% for photo in polish.swatch_photo %}
-                        <a
-                            href="{{ url_for('serve_my_data', filename=photo.path) }}"
-                            data-lightbox="swatch-{{ polish.id }}"
-                        >
-                            <img
-                                src="{{ url_for('serve_my_data', filename=photo.path) }}"
-                                class="thumbnail"
-                            />
+                        <a href="{{ url_for('serve_my_data', filename=photo.path) }}" data-lightbox="swatch-{{ polish.id }}">
+                            <img src="{{ url_for('serve_my_data', filename=photo.path) }}" class="thumbnail"/>
                         </a>
                         {% endfor %}
                     </div>
