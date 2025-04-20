@@ -1,0 +1,105 @@
+<!-- templates/mani_logs.html -->
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8">
+        <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+        <title>All Polishes</title>
+        <link 
+            rel="stylesheet"
+            href="https://cdnjs.cloudflare.com/ajax/libs/lightbox2/2.11.4/css/lightbox.min.css"
+        />
+    </head>
+    <body>
+        <h1>All Manicures</h1>
+        
+        <p><a href="{{ url_for('index') }}">Back to Home</a></p>
+
+        <!-- Form: Filtering list -->
+        <!-- <form method="get">
+            <label for="brand_id">Brands:</label>
+            <select name="brand_id" multiple>
+                {% for brand in all_brands %}
+                <option value="{{ brand.id }}" {% if brand.id|string in request.args.getlist('brand_id') %}selected{% endif %}>{{ brand.name }}</option>
+                {% endfor %}
+            </select>
+
+            <label for="color_family">Color Families:</label>
+            <select name="color_family" multiple>
+                {% for color in color_families %}
+                <option value="{{ color }}" {% if color in request.args.getlist('color_family') %}selected{% endif %}>{{ color }}</option>
+                {% endfor %}
+            </select>
+
+            <label for="tag">Tags:</label>
+            <select name="tag" multiple>
+                {% for tag in all_tags %}
+                <option value="{{ tag.id }}" {% if tag.id|string in request.args.getlist('tag') %}selected{% endif %}>{{ tag.name }}</option>
+                {% endfor %}
+            </select>
+
+            <label>Tag logic:</label>
+            <select name="tag_logic">
+                <option value="or" {% if request.args.get('tag_logic') == 'or' %}selected{% endif %}>Match any</option>
+                <option value="and" {% if request.args.get('tag_logic') == 'and' %}selected{% endif %}>Match all</option>
+            </select>
+
+            <label><input type="checkbox" name="destashed" value="1" {% if request.args.get('destashed') %}checked{% endif %}/> Show only destashed</label>
+
+            <button type="submit">Apply Filters</button>
+        </form> -->
+
+        <!-- Table: List -->
+        <table border="1" cellpadding="8">
+            <tr>
+                <th>Date</th>
+                <th>Polish(es)</th>
+                <!-- <th>Brand(s)</th>
+                <th>Color</th>
+                <th>Tags</th>
+                <th>Photos</th> -->
+            </tr>
+            {% for mani_log in mani_logs %}
+            <tr>
+                <td>{{ mani_log.mani_date }}</td>
+                <td>
+                    {% set polishes = mani_log.polish.all() %}
+                    {% if polishes %}
+                        {% for polish in polishes %}
+                            {{ polish.name }}{% if not loop.last %}, {% endif %}
+                        {% endfor %}
+                    {% else %}
+                        <em>No polish</em>
+                    {% endif %}
+                </td>
+                <!-- Need a way to import brand info from Polish and Brand -->
+                <!-- {# <td>{{ polish.brand.name if polish.brand else "-" }}</td> #} -->
+                <!-- {# <td>{{ polish.color_family or "-" }}</td> #} -->
+                <!-- {# <td>
+                    {% for tag in mani_log.tag %}
+                    <span class="tag-label">{{ tag.name }}</span>
+                    {% else %}
+                    <em>No tags</em>
+                    {% endfor %}
+                </td> 
+                <td>
+                    {% if mani_log.mani_photo %}
+                    <div class="swatch-gallery">
+                        {% for photo in mani_log.mani_photo %}
+                        <a href="{{ url_for('serve_my_data', filename=photo.path) }}" data-lightbox="mani-{{ mani_log.id }}">
+                            <img src="{{ url_for('serve_my_data', filename=photo.path) }}" class="thumbnail"/>
+                        </a>
+                        {% endfor %}
+                    </div>
+                    {% else %}
+                        <em>No photos</em>
+                    {% endif %}
+                </td> #} -->
+            </tr>
+            {% endfor %}
+        </table>
+
+        <p><a href="{{ url_for('index') }}">Back to Home</a></p>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/lightbox2/2.11.4/js/lightbox-plus-jquery.min.js"></script>
+    </body>
+ </html>

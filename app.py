@@ -1,7 +1,6 @@
 from flask import Flask, render_template, request, redirect, url_for, flash, send_from_directory
-from models import db, migrate, Polish, Brand, Tag
+from models import db, migrate, Polish, Brand, Tag, ManiLog
 from dotenv import load_dotenv
-from sqlalchemy import and_, or_
 import os
 
 """
@@ -161,6 +160,12 @@ def create_app():
             polish_types=polish_types,
             request=request,
         )
+    
+    # Route for displaying mani logs
+    @app.route("/manis")
+    def view_mani_logs():
+        mani_logs = ManiLog.query.order_by(ManiLog.mani_date.desc()).all()
+        return render_template("mani_logs.html", mani_logs=mani_logs)
 
     # Route for accessing my data
     @app.route("/my_data/<path:filename>")
