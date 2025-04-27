@@ -68,12 +68,19 @@ with app.app_context():
                 polish_record = None
             if polish_record:
                 # Add path to the SwatchPhoto (swatch_photos) table
-                photo = SwatchPhoto(
-                    path=photo_path,
-                    polish_id=polish_record.id
-                )
-                photos_to_commit.append(photo)
-                print(f"Created new photo record to commit in batch for: '{polish_record.name}' by {polish_record.brand.name}\n")
+                
+                existing_photo = SwatchPhoto.query.filter_by(path=photo_path).first()
+
+                if existing_photo:
+                    print(f"Skipping already imported photo: {photo_path}")
+                else:
+                    photo = SwatchPhoto(
+                        path=photo_path,
+                        polish_id=polish_record.id
+                    )
+                    photos_to_commit.append(photo)
+                    print(f"Created new photo record to commit in batch for: '{polish_record.name}' by {polish_record.brand.name}\n")
+                
             if not polish_record:
                 print(f"No polish record. Skipping import of file:\n{photo_path}")
                 unmatched_paths.append(photo_path)

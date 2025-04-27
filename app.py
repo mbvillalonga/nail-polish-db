@@ -44,6 +44,33 @@ def create_app():
     def add():
         brands = Brand.query.order_by(Brand.name).all()
 
+        # Color family labels
+        color_family_labels = {
+            "clear/white": "Clear / White",
+            "black": "Black",
+            "grey/silver": "Grey / Silver",
+            "nude/gold/brown": "Nude / Gold / Brown",
+            "red": "Red",
+            "coral/orange": "Coral / Orange",
+            "yellow": "Yellow",
+            "green": "Green",
+            "teal/turq/aqua": "Teal / Turquoise / Aqua",
+            "blue": "Blue",
+            "indigo": "Indigo",
+            "violet": "Violet",
+            "fuchsia": "Fuchsia",
+            "pink": "Pink",
+            "base/top coat": "Base / Top Coat"
+        }
+
+        polish_type_labels = {
+            "color": "Color",
+            "top coat": "Top Coat",
+            "base coat": "Base Coat",
+            "stamping polish": "Stamping Polish",
+            "other": "Other"
+        }
+
         if request.method == "POST":  # when user submits the form:
             name = request.form["name"].strip()  # extract polish name
 
@@ -102,7 +129,12 @@ def create_app():
 
             return redirect(url_for("index"))  # return to home page
         
-        return render_template("add.html", brands=brands)  # displays the add.html form
+        return render_template(
+            "add.html", 
+            brands=brands,
+            color_family_labels = color_family_labels,
+            polish_type_labels = polish_type_labels
+        )  # displays the add.html form
 
     # Route for displaying all polishes and info: brand, color, etc.
     @app.route("/polishes")
