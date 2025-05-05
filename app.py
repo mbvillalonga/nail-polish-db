@@ -1,4 +1,4 @@
-from flask import Flask, render_template, request, redirect, url_for, flash, send_from_directory
+from flask import Flask, render_template, request, redirect, url_for, flash, send_from_directory, jsonify
 from models import db, migrate, Polish, Brand, Tag, ManiLog
 from dotenv import load_dotenv
 import os
@@ -192,6 +192,22 @@ def create_app():
             polish_types=polish_types,
             request=request,
         )
+    
+    # route for handling in-line updates
+    @app.route("/update_polish_field", methods=["POST"])
+    def update_polish_field():
+        data = request.get_json()
+        polish_id = data.get("id")
+        field = data.get("field")
+        value = data.get("value")
+
+        polish = Polish.query.get(polish_id)
+        if not polish or field not in {"name", "full_desc"}:
+            return jsonify({"success": False}), 400
+        
+        setattr(polish, field, value.strip())
+        db.session.commit()
+        return jsonify({"success": True})
     
     # Route for displaying mani logs
     @app.route("/manis")

@@ -66,8 +66,8 @@
             </tr>
             {% for polish in polishes %}
             <tr>
-                <td>
-                    {{ polish.name }}
+                <td class="editable" data-id="{{ polish.id }}" data-field="name">
+                    <span class="field-value">{{ polish.name }}</span>
                     {% if polish.destashed_flag %}
                     <span class="destash-label">Destashed</span>
                     {% endif %}
@@ -81,7 +81,9 @@
                     <em>No tags</em>
                     {% endfor %}
                 </td>
-                <td>{{ polish.full_desc or "-" }}</td>
+                <td class="editable" data-id="{{ polish.id }}" data-field="full_desc">
+                    <span class="field-value">{{ polish.full_desc or "-" }}</span>
+                </td>
                 <td>
                     {% if polish.swatch_photo %}
                     <div class="swatch-gallery">
@@ -101,5 +103,79 @@
 
         <p><a href="{{ url_for('index') }}">Back to Home</a></p>
         <script src="https://cdnjs.cloudflare.com/ajax/libs/lightbox2/2.11.4/js/lightbox-plus-jquery.min.js"></script>
+
+        <script>
+        function setupEditableCell(cell) {
+            const field = cell.dataset.field;
+            const id = cell.dataset.id;
+
+            const getCurrentSpan = () => cell.querySelector('.field-value');
+
+            const createEditor = () => {
+                const currentValue = getCurrentSpan().textContent.trim();
+                const input = document.createElement(field === 'full_desc' ? 'textarea' : 'input');
+                input.value = currentValue;
+                input.className = 'edit-input';
+                return { input, currentValue };
+            };
+
+            const commitChange = (input, originalValue) => {
+                const newValue = input.value.trim();
+                if (newValue === originalValue) {
+                    renderValue(originalValue);
+                    return;
+                }
+
+                fetch(`/update_polish_field`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ id, field, value: newValue })
+                })
+                .then(res => res.json())
+                .then(data => {
+                    if (data.success) {
+                        renderValue(newValue);
+                    } else {
+                        alert('Update failed.');
+                        renderValue(originalValue);
+                    }
+                })
+                .catch(() => {
+                    alert('Server error.');
+                    renderValue(originalValue);
+                });
+            };
+
+            const renderValue = (value) => {
+                cell.innerHTML = '';
+                const span = document.createElement('span');
+                span.className = 'field-value';
+                span.textContent = value;
+                cell.appendChild(span);
+                setupEditableCell(cell);
+            };
+
+            const handleDblClick = () => {
+                const { input, currentValue } = createEditor();
+                cell.innerHTML = '';
+                cell.appendChild(input);
+                input.focus();
+
+                input.addEventListener('blur', () => commitChange(input, currentValue));
+                input.addEventListener('keydown', e => {
+                    if (e.key === 'Enter' && field !== 'full_desc') {
+                        e.preventDefault();
+                        input.blur();
+                    }
+                });
+            };
+
+            cell.addEventListener('dblclick', handleDblClick);
+        }
+            
+        document.addEventListener('DOMContentLoaded', () => {
+            document.querySelectorAll('.editable').forEach(setupEditableCell);
+        });
+        </script>
     </body>
- </html>
+</html>
