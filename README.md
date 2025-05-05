@@ -1,6 +1,6 @@
 # nail-polish-db
 
-*A relational database and GUI app for managing my nail polish collection*
+*An interactive web application for managing inventory, product photos, and usage logs in a structured database, built with Python, Flask, and MySQL.*
 
 ## Overview
 
