@@ -1,6 +1,6 @@
 # nail-polish-db
 
-*An interactive web application for managing inventory, product photos, and usage logs in a structured database, built with Python, Flask, and MySQL.*
+*An interactive web application for managing inventory, product photos, and usage logs in a structured relational database. Built with Python, Flask, and MySQL.*
 
 ## Overview
 

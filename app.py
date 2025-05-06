@@ -1,6 +1,7 @@
 from flask import Flask, render_template, request, redirect, url_for, flash, send_from_directory, jsonify
 from models import db, migrate, Polish, Brand, Tag, ManiLog
 from dotenv import load_dotenv
+from sqlalchemy import func
 import os
 
 """
@@ -178,17 +179,23 @@ def create_app():
 
         # Pass data needed for filter form dropdowns
         all_brands = Brand.query.order_by(Brand.name).all()
+        brand_names = [b.name for b in Brand.query.order_by(Brand.name).all()]
+
         all_tags = Tag.query.order_by(Tag.name).all()
 
         color_families = list(Polish.color_family.property.columns[0].type.enums)
+        color_families_options = Polish.color_family.property.columns[0].type.enums
+
         polish_types = list(Polish.polish_type.property.columns[0].type.enums)
 
         return render_template(
             "polishes.html",
             polishes=polishes,
             all_brands=all_brands,
+            brand_names=brand_names,
             all_tags=all_tags,
             color_families=color_families,
+            color_families_options=color_families_options,
             polish_types=polish_types,
             request=request,
         )
@@ -202,10 +209,22 @@ def create_app():
         value = data.get("value")
 
         polish = Polish.query.get(polish_id)
-        if not polish or field not in {"name", "full_desc"}:
+
+        if field == "brand":
+            brand = Brand.query.filter(func.lower(Brand.name) == value.strip().lower()).first()            
+            if not brand:
+                return jsonify({"success": False, "error": "Brand not found"}), 400
+                #add new brand: POTENTIALLY, LATER:
+                # brand = Brand(name=value.strip())
+                # db.session.add(brand) 
+                # db.session.flush() #get brand.id without committing
+            polish.brand_id = brand.id
+        else:
+            setattr(polish, field, value.strip())
+
+        if not polish or field not in {"name", "full_desc", "color_family", "brand"}:
             return jsonify({"success": False}), 400
         
-        setattr(polish, field, value.strip())
         db.session.commit()
         return jsonify({"success": True})
     

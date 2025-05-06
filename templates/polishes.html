@@ -72,8 +72,12 @@
                     <span class="destash-label">Destashed</span>
                     {% endif %}
                 </td>
-                <td>{{ polish.brand.name if polish.brand else "-" }}</td>
-                <td>{{ polish.color_family or "-" }}</td>
+                <td class="editable" data-id="{{ polish.id }}" data-field="brand" data-options='{{ brand_names | tojson | safe}}'>
+                    <span class="field-value">{{ polish.brand.name if polish.brand else "-" }}</span>
+                </td>
+                <td class="editable" data-id="{{ polish.id }}" data-field="color_family" data-options='{{ color_families_options | tojson | safe }}'>
+                    <span class="field-value">{{ polish.color_family or "-" }}</span>
+                </td>
                 <td>
                     {% for tag in polish.tag %}
                     <span class="tag-label">{{ tag.name }}</span>
@@ -105,77 +109,102 @@
         <script src="https://cdnjs.cloudflare.com/ajax/libs/lightbox2/2.11.4/js/lightbox-plus-jquery.min.js"></script>
 
         <script>
-        function setupEditableCell(cell) {
-            const field = cell.dataset.field;
-            const id = cell.dataset.id;
-
-            const getCurrentSpan = () => cell.querySelector('.field-value');
-
-            const createEditor = () => {
-                const currentValue = getCurrentSpan().textContent.trim();
-                const input = document.createElement(field === 'full_desc' ? 'textarea' : 'input');
-                input.value = currentValue;
-                input.className = 'edit-input';
-                return { input, currentValue };
-            };
-
-            const commitChange = (input, originalValue) => {
-                const newValue = input.value.trim();
-                if (newValue === originalValue) {
-                    renderValue(originalValue);
-                    return;
-                }
-
-                fetch(`/update_polish_field`, {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ id, field, value: newValue })
-                })
-                .then(res => res.json())
-                .then(data => {
-                    if (data.success) {
-                        renderValue(newValue);
-                    } else {
-                        alert('Update failed.');
-                        renderValue(originalValue);
-                    }
-                })
-                .catch(() => {
-                    alert('Server error.');
-                    renderValue(originalValue);
-                });
-            };
-
-            const renderValue = (value) => {
-                cell.innerHTML = '';
-                const span = document.createElement('span');
-                span.className = 'field-value';
-                span.textContent = value;
-                cell.appendChild(span);
-                setupEditableCell(cell);
-            };
-
-            const handleDblClick = () => {
-                const { input, currentValue } = createEditor();
-                cell.innerHTML = '';
-                cell.appendChild(input);
-                input.focus();
-
-                input.addEventListener('blur', () => commitChange(input, currentValue));
-                input.addEventListener('keydown', e => {
-                    if (e.key === 'Enter' && field !== 'full_desc') {
-                        e.preventDefault();
-                        input.blur();
-                    }
-                });
-            };
-
-            cell.addEventListener('dblclick', handleDblClick);
-        }
+            function setupEditableCell(cell) {
+                const field = cell.dataset.field;
+                const id = cell.dataset.id;
             
-        document.addEventListener('DOMContentLoaded', () => {
-            document.querySelectorAll('.editable').forEach(setupEditableCell);
-        });
+                let options = [];
+                try {
+                    options = JSON.parse(cell.dataset.options || "[]");
+                } catch (e) {
+                    options = [];
+                }
+            
+                const createEditor = () => {
+                    const span = cell.querySelector('.field-value');
+                    const currentValue = span ? span.textContent.trim() : '';
+                    const input = document.createElement(field === 'full_desc' ? 'textarea' : 'input');
+                    input.value = currentValue;
+                    input.className = 'edit-input';
+            
+                    if (options.length > 0) {
+                        const listId = `options-${field}-${id}`;
+                        input.setAttribute('list', listId);
+            
+                        // ✅ Append datalist to <body>, not <td>
+                        if (!document.getElementById(listId)) {
+                            const datalist = document.createElement('datalist');
+                            datalist.id = listId;
+                            options.forEach(opt => {
+                                const optionElem = document.createElement('option');
+                                optionElem.value = opt;
+                                datalist.appendChild(optionElem);
+                            });
+                            document.body.appendChild(datalist);
+                        }
+                    }
+            
+                    return { input, currentValue };
+                };
+            
+                const commitChange = (input, originalValue) => {
+                    const newValue = input.value.trim();
+                    if (newValue === originalValue) {
+                        renderValue(originalValue);
+                        return;
+                    }
+            
+                    fetch(`/update_polish_field`, {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ id, field, value: newValue })
+                    })
+                    .then(res => res.json())
+                    .then(data => {
+                        if (data.success) {
+                            renderValue(newValue);
+                        } else {
+                            alert('Update failed.');
+                            renderValue(originalValue);
+                        }
+                    })
+                    .catch(() => {
+                        alert('Server error.');
+                        renderValue(originalValue);
+                    });
+                };
+            
+                const renderValue = (value) => {
+                    cell.innerHTML = '';
+                    const span = document.createElement('span');
+                    span.className = 'field-value';
+                    span.textContent = value;
+                    cell.appendChild(span);
+                    setupEditableCell(cell);
+                };
+            
+                const handleDblClick = () => {
+                    const { input, currentValue } = createEditor();
+                    cell.innerHTML = '';
+                    cell.appendChild(input);
+                    input.focus();
+            
+                    input.addEventListener('blur', () => commitChange(input, currentValue));
+                    input.addEventListener('keydown', e => {
+                        if (e.key === 'Enter' && field !== 'full_desc') {
+                            e.preventDefault();
+                            input.blur();
+                        }
+                    });
+                };
+            
+                cell.addEventListener('dblclick', handleDblClick);
+            }
+            
+            document.addEventListener('DOMContentLoaded', () => {
+                document.querySelectorAll('.editable').forEach(setupEditableCell);
+            });
         </script>
+            
     </body>
 </html>
