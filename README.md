@@ -115,11 +115,19 @@ nail-polish-db/
 - ManiLog table with date + polish associations
 - Filtering by brand, color family, type, tag, and destashed flag
 
+### In Progress
+
+- Full CRUD for ManiLog
+  - Users will be able to log a new manicure by selecting a date, one or more polishes, and one or more tags
+  - Interface will support multi-polish selection, multi-tag selection
+  - Users will also have the option to create new tags and add them to the current manicure record
+  - Future enhancements will include photo support
+
 ### Planned
 
-- Add/edit UI for ManiLog entries (date, polish selection, tags)
-- Inline editing for `polish_type`
-- Tag editing with multi-select support
+- Add optional photo upload field to `add.html`
+- Inline editing for `polish_type` (`polishes.html`, `app.py`)
+- Tag adding/editing with multi-select support (`polishes.html`, `add.html`, `mani_logs.html`, `add_mani.html`)
 - Collection stats/dashboard view (most-used tags, polish type breakdown, etc.)
 - CSV export for polish and mani data
 - Optional cloud storage migration for swatch photos

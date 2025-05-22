@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<!-- 5/22/25: NOTES TO SELF ABOUT DEVELOPMENT IN COMMENTS -->
+
+<head>
+    <title>Add a New Manicure Record</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+    {% with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}
+            <ul class="flashes">
+        {% for category, message in messages %}
+            <li class="{{ category }}">{{ message }}</li>
+        {% endfor %}
+            </ul>
+        {% endif %}
+    {% endwith %}
+
+    <h1>Add a New Manicure Record</h1>
+
+    <form method="POST"> 
+        <!-- UPDATE "name" TO SAY "date" - CHECK HOW THIS PLAYS WITH app.py -->
+        <label for="name">Date:</label><br> 
+        <input type="text" id="name" name="name" required><br><br><br> 
+
+        <!-- UPDATE "polish_type" TO SAY "polish/es" - CHECK HOW THIS PLAYS WITH app.py -->
+        <label for="polish_type">Polish(es) used:</label><br> 
+        <select id="polish_type" name="polish_type" required> 
+            <!-- UPDATE THE LOGIC BELOW TO TURN FIELD INTO AN AUTO-COMPLETE MULTI-SELECT
+            {% for value, label in polish_type_labels.items() %}
+                <option value="{{ value }}">{{ label }}</option>
+            {% endfor %}
+            -->
+        </select><br><br><br>
+
+        <!-- USE CODE BELOW AS BASIS FOR POLISH AND TAG SELECTION:
+        <label for="brand">Brand:</label><br>
+        <select name="brand" id="brand" onchange="toggleNewBrandField()" required>
+            {% for brand in brands %}
+                <option value="{{ brand.id }}">{{ brand.name }}</option>
+            {% endfor %}
+            <option value="new">-- Add New Brand --</option>
+        </select><br><br><br> 
+        
+        <div id="new-brand-container" style="display:none;">
+            <label for="new_brand">New brand name:</label><br>
+            <input type="text" name="new_brand" id="new_brand"><br><br><br>
+        </div>  
+        -->
+
+        <!-- UPDATE TAGS FIELD TO BE AUTO-COMPLETE WITH OPTION TO ADD NEW -->
+        <label for="tags">Tags (comma-separated):</label><br>
+        <input type="text" id="tags" name="tags" placeholder="e.g. shimmer, flakies, jelly"><br><br><br>
+
+        <button type="submit">Add Manicure Record</button><br><br><br>
+    </form>
+    <a href="{{ url_for('index') }}">Back to Mani Log</a>
+
+    <!-- UPDATE BELOW TO WORK WITH POLISHES AND TAGS FIELDS -->
+    <script> 
+        function toggleNewBrandField() {
+            const brandSelect = document.getElementById("brand");
+            const newBrandContainer = document.getElementById("new-brand-container");
+            newBrandContainer.style.display = (brandSelect.value === "new") ? "block" : "none";
+        }
+    </script>
+</body>
+</html>
