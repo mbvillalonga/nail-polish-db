@@ -30,6 +30,8 @@ This project serves two purposes:
 
 ## Getting Started
 
+**UNDER CONSTRUCTION**
+
 ### 1. Clone the repository
 
 In a terminal window, navigate to the directory where you would like to clone the repo. Then run the following:
@@ -123,6 +125,9 @@ nail-polish-db/
 - Optional cloud storage migration for swatch photos
 - Bulk import of usage photos (ManiPhoto) and order logs (OrderLog)
 - Development of UI for Recipe and Ingredient tables
+- Add/edit UI for OrderLog entries (date, vendor/item info, budgeting utilities)
+- Add/edit UI for Recipe entries (ingredients, quantities, batch info)
+
 
 ## Screenshots
 
