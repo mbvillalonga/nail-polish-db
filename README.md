@@ -15,14 +15,20 @@ This project serves two purposes:
 
 ## Features
 
-- Store and manage lists of nail polishes and brands
-- Store and manage lists of custom lacquer recipes and ingredients
-- Record purchase history and track usage
-- Web-based interface with an HTML front end using Flask
-- SQLAlchemy ORM for managing a MySQL database
-- Example scripts for querying and seeding data
+- Add and edit individual polish records with brand, type, color family, tags, and full descriptions
+- Inline editing of polish fields (name, color, brand, etc.) with autocomplete
+- Attach swatch photos and browse polishes with thumbnails
+- Track usage logs with polish/tag relationships
+- Server-side filtering by brand, color, polish type, tag, and destashed status
+- Supports bulk data import and relational linking via custom scripts
 
-## Installation
+## Tech Stack
+
+- Python, Flask, SQLAlchemy
+- MySQL: relational schema, enum fields, associations
+- HTML, CSS, JavaScript (vanilla with fetch/datalist)
+
+## Getting Started
 
 ### 1. Clone the repository
 
@@ -72,10 +78,6 @@ If necessary, also edit the `DB_HOST` and `DB_NAME` fields. Files are currently 
 
 **UNDER CONSTRUCTION**
 
-## Usage
-
-**UNDER CONSTRUCTION**
-
 ## Project structure
 
 Below is the file structure for the minimal working example:
@@ -98,31 +100,29 @@ nail-polish-db/
 |-- README.md           # Documentation
 ```
 
-## Available commands
+## **Project Status / Roadmap**
 
-**UNDER CONSTRUCTION**
+### Completed 
 
-## Future improvements
+- Add polish records with brand, color family, type, tags, and full description
+- Inline editing for polish fields:
+  - `name`, `full_desc`, `color_family`, and `brand`
+  - Autocomplete enabled for `color_family` and `brand` (limited to existing brands only)
+- Swatch photo import with CSV-based path mapping
+- Display thumbnails and lightbox views for swatches
+- ManiLog table with date + polish associations
+- Filtering by brand, color family, type, tag, and destashed flag
 
-### Tags
+### Planned
 
-- A table that stores tags used to categorize polishes, manicures, ingredients. Useful for filtering and grouping.
-  - Added to models.py: 4/6/25
-  - Added to app.py: 4/6/25
-
-### Edit route and form
-
-- Implement a way to edit individual records in the Flask app, in case of data entry errors.
-
-### Polish list
-
-- Tags for easy filtering by finish, colors, etc.: Create a many-to-many relationship (done: 4/6/25)
-- Convert `color_family` attribute from string to single-select drop-down
-- Add a destashed attribute
-
-### Manicure log
-
-- Include a way to specify type of manicure for accuracy of usage statistics
+- Add/edit UI for ManiLog entries (date, polish selection, tags)
+- Inline editing for `polish_type`
+- Tag editing with multi-select support
+- Collection stats/dashboard view (most-used tags, polish type breakdown, etc.)
+- CSV export for polish and mani data
+- Optional cloud storage migration for swatch photos
+- Bulk import of usage photos (ManiPhoto) and order logs (OrderLog)
+- Development of UI for Recipe and Ingredient tables
 
 ## Screenshots
 

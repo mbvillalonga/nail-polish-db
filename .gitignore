@@ -20,6 +20,7 @@ venv.bak/
 backup.sql
 *.db
 my_data/
+worklog.md
 
 # Ignore .DS_Store
 .DS_Store
