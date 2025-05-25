@@ -28,9 +28,7 @@ This project serves two purposes:
 - MySQL: relational schema, enum fields, associations
 - HTML, CSS, JavaScript (vanilla with fetch/datalist)
 
-## Getting Started
-
-**UNDER CONSTRUCTION**
+## Getting Started (*under construction*)
 
 ### 1. Clone the repository
 
@@ -51,6 +49,7 @@ source venv/bin/activate
 ```
 
 For Windows:
+
 ```bash
 python -m venv venv
 venv\Scripts\activate
@@ -62,9 +61,9 @@ venv\Scripts\activate
 pip install -r requirements.txt
 ```
 
-### Database Setup
+### 4. Database setup
 
-#### Update environment variables
+#### 4a. Update environment variables
 
 - Create your own .env file using the example:
 
@@ -76,9 +75,7 @@ In your .env file, replace `your_username` and `your_password` with your own MyS
 
 If necessary, also edit the `DB_HOST` and `DB_NAME` fields. Files are currently written to work with `localhost` and `nail_db`, respectively.
 
-#### Create MySQL database
-
-**UNDER CONSTRUCTION**
+#### 4b. Create MySQL database (*under construction*)
 
 ## Project structure
 
@@ -104,7 +101,7 @@ nail-polish-db/
 
 ## **Project Status / Roadmap**
 
-### Completed 
+### Completed
 
 - Add polish records with brand, color family, type, tags, and full description
 - Inline editing for polish fields:
@@ -117,11 +114,17 @@ nail-polish-db/
 
 ### In Progress
 
-- Full CRUD for ManiLog
+- Full CRUD for `mani_logs` record creation
   - Users will be able to log a new manicure by selecting a date, one or more polishes, and one or more tags
   - Interface will support multi-polish selection, multi-tag selection
   - Users will also have the option to create new tags and add them to the current manicure record
   - Future enhancements will include photo support
+
+- CRUD for image uploads (*e.g.*, item photos, usage photos)
+  - Users will be able to upload images for each item (polish) or usage record (manicure) when creating record using Add form
+  - Add form will create image directory and rename uploaded file(s) using database identifier(s)
+  - Interface will support in-line uploading, if user wants to upload image after parent record creation
+  - Image upload will create thumbnails for faster loading on main pages, reserving full-size for lightbox viewing
 
 ### Planned
 
@@ -136,11 +139,6 @@ nail-polish-db/
 - Add/edit UI for OrderLog entries (date, vendor/item info, budgeting utilities)
 - Add/edit UI for Recipe entries (ingredients, quantities, batch info)
 
+## Screenshots (*under construction*)
 
-## Screenshots
-
-**UNDER CONSTRUCTION**
-
-## License
-
-**UNDER CONSTRUCTION**
+## License (*under construction*)

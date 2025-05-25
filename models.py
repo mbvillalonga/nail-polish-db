@@ -351,6 +351,9 @@ class Ingredient(db.Model):
         lazy="dynamic",
     )
 
+
+# class: Tag
+# creates `tags` table
 class Tag(db.Model):
     __tablename__ = "tags"
 
