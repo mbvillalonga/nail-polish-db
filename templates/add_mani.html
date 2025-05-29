@@ -5,6 +5,8 @@
 
 <head>
     <title>Add a New Manicure Record</title>
+    <script src="https://cdn.jsdelivr.net/npm/@yaireo/tagify"></script>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@yaireo/tagify/dist/tagify.css">
     <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
 </head>
 <body>
@@ -21,50 +23,87 @@
     <h1>Add a New Manicure Record</h1>
 
     <form method="POST"> 
-        <!-- UPDATE "name" TO SAY "date" - CHECK HOW THIS PLAYS WITH app.py -->
-        <label for="name">Date:</label><br> 
-        <input type="text" id="name" name="name" required><br><br><br> 
+        <label for="date">Date:</label><br> 
+        <input type="date" id="date" name="date" required><br><br><br> 
 
-        <!-- UPDATE "polish_type" TO SAY "polish/es" - CHECK HOW THIS PLAYS WITH app.py -->
-        <label for="polish_type">Polish(es) used:</label><br> 
-        <select id="polish_type" name="polish_type" required> 
-            <!-- UPDATE THE LOGIC BELOW TO TURN FIELD INTO AN AUTO-COMPLETE MULTI-SELECT
-            {% for value, label in polish_type_labels.items() %}
-                <option value="{{ value }}">{{ label }}</option>
-            {% endfor %}
-            -->
-        </select><br><br><br>
+        <label for="polishes_used">Polish(es) used:</label><br> 
+        <input id="polishes_used" name="polishes_used" required><br><br><br>
 
-        <!-- USE CODE BELOW AS BASIS FOR POLISH AND TAG SELECTION:
-        <label for="brand">Brand:</label><br>
-        <select name="brand" id="brand" onchange="toggleNewBrandField()" required>
-            {% for brand in brands %}
-                <option value="{{ brand.id }}">{{ brand.name }}</option>
-            {% endfor %}
-            <option value="new">-- Add New Brand --</option>
-        </select><br><br><br> 
-        
-        <div id="new-brand-container" style="display:none;">
-            <label for="new_brand">New brand name:</label><br>
-            <input type="text" name="new_brand" id="new_brand"><br><br><br>
-        </div>  
-        -->
-
-        <!-- UPDATE TAGS FIELD TO BE AUTO-COMPLETE WITH OPTION TO ADD NEW -->
-        <label for="tags">Tags (comma-separated):</label><br>
-        <input type="text" id="tags" name="tags" placeholder="e.g. shimmer, flakies, jelly"><br><br><br>
+        <label for="tags">Tags:</label><br>
+        <input id="tags" name="tags" placeholder="e.g. shimmer, flakies, jelly"><br><br><br>
 
         <button type="submit">Add Manicure Record</button><br><br><br>
     </form>
     <a href="{{ url_for('index') }}">Back to Mani Log</a>
 
-    <!-- UPDATE BELOW TO WORK WITH POLISHES AND TAGS FIELDS -->
-    <script> 
-        function toggleNewBrandField() {
-            const brandSelect = document.getElementById("brand");
-            const newBrandContainer = document.getElementById("new-brand-container");
-            newBrandContainer.style.display = (brandSelect.value === "new") ? "block" : "none";
-        }
+    <!-- Tagify for Polishes and Tags -->
+    <script>
+    document.addEventListener("DOMContentLoaded", function () {
+        // POLISHES
+        const polishInput = document.getElementById("polishes_used");
+
+        const polishTagify = new Tagify(polishInput, {
+            tagTextProp: "label",
+            mapValueTo: "value",
+            enforceWhitelist: false,
+            skipInvalid: true,
+            whitelist: [],
+            dropdown: {
+                enabled: 1,
+                maxItems: 10,
+                closeOnSelect: true,
+                searchKeys: ["label"]
+            },
+            templates: {
+                tag: tagData => `
+                    <tag title="${tagData.label}" contenteditable='false' class='tagify__tag'>
+                        <x title='remove tag' class='tagify__tag__removeBtn'></x>
+                        <div>
+                            <span class='tagify__tag-text'>${tagData.label}</span>
+                        </div>
+                    </tag>`,
+                dropdownItem: tagData => `
+                    <div class='tagify__dropdown__item' tabindex="0">
+                        ${tagData.label}
+                    </div>`
+            }
+        });
+
+        polishTagify.on("input", function (e) {
+            const value = e.detail.value;
+            if (!value) return;
+
+            fetch(`/search/polishes?q=${encodeURIComponent(value)}`)
+                .then(res => res.json())
+                .then(data => {
+                    polishTagify.whitelist = data;
+                    polishTagify.dropdown.show.call(polishTagify, value);
+                })
+                .catch(err => console.error("Error fetching polish list:", err));
+        });
+
+        // TAGS
+        const tagInput = document.getElementById("tags");
+        const tagTagify = new Tagify(tagInput, {
+            dropdown: {
+                maxItems: 10,
+                enabled: 1,
+                closeOnSelect: false
+            }
+        });
+
+        tagTagify.on("input", e => {
+            const value = e.detail.value;
+            if (!value) return;
+
+            fetch(`/search/tags?q=${value}`)
+                .then(res => res.json())
+                .then(data => {
+                    tagTagify.settings.whitelist = data;
+                    tagTagify.dropdown.show.call(tagTagify, value);
+                });
+        });
+    });
     </script>
 </body>
 </html>

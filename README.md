@@ -99,20 +99,29 @@ nail-polish-db/
 |-- README.md           # Documentation
 ```
 
-## **Project Status / Roadmap**
+## **Project Status**
 
-### Completed
+### Overall Roadmap
 
-- Add polish records with brand, color family, type, tags, and full description
+1. Build app's structural skeleton (in progress)
+2. Validate data flows (in progress)
+3. Layer in UI structure
+4. Add UX enhancements
+5. Final styling
+
+#### Completed
+
+- Polish table with brand, color family, type, tags, and full description
+- Add form for new polish records
 - Inline editing for polish fields:
   - `name`, `full_desc`, `color_family`, and `brand`
   - Autocomplete enabled for `color_family` and `brand` (limited to existing brands only)
-- Swatch photo import with CSV-based path mapping
+- Bulk import of swatch photo import with CSV-based path mapping
 - Display thumbnails and lightbox views for swatches
 - ManiLog table with date + polish associations
 - Filtering by brand, color family, type, tag, and destashed flag
 
-### In Progress
+#### In Progress
 
 - Full CRUD for `mani_logs` record creation
   - Users will be able to log a new manicure by selecting a date, one or more polishes, and one or more tags
@@ -126,7 +135,7 @@ nail-polish-db/
   - Interface will support in-line uploading, if user wants to upload image after parent record creation
   - Image upload will create thumbnails for faster loading on main pages, reserving full-size for lightbox viewing
 
-### Planned
+#### Planned
 
 - Add optional photo upload field to `add.html`
 - Inline editing for `polish_type` (`polishes.html`, `app.py`)

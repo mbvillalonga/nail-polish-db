@@ -2,11 +2,13 @@ from flask import Flask, render_template, request, redirect, url_for, flash, sen
 from models import db, migrate, Polish, Brand, Tag, ManiLog
 from dotenv import load_dotenv
 from sqlalchemy import func
+from datetime import datetime
 import os
+import json
 
 """
 app.py
-Set up a basic route to display polish inventory and add new records.
+Set up routes for nail-polish-db: display polish inventory, display mani logs, and add new records.
 Mercedes Villalonga, 2025
 """
 
@@ -39,9 +41,72 @@ def create_app():
             "index.html", polishes=polishes
         )  # render index.html template
 
+    # Route for displaying all polishes and info: brand, color, etc.
+    @app.route("/polishes")
+    def view_polishes():
+        #polishes = Polish.query.order_by(Polish.name).all()
+        #return render_template("polishes.html", polishes=polishes)
+    
+        polishes_query = Polish.query
+
+        # Get filter parameters
+        brand_ids = request.args.getlist("brand_id")
+        colors = request.args.getlist("color_family")
+        types = request.args.getlist("polish_type")
+        tag_ids = request.args.getlist("tag")
+        tag_logic = request.args.get("tag_logic", "or")
+        destashed_only = request.args.get("destashed")
+
+        # Apply filters dynamically
+        if brand_ids:
+            polishes_query = polishes_query.filter(Polish.brand_id.in_(brand_ids))
+
+        if colors:
+            polishes_query = polishes_query.filter(Polish.color_family.in_(colors))
+
+        if types:
+            polishes_query = polishes_query.filter(Polish.polish_type.in_(types))
+
+        if destashed_only:
+            polishes_query = polishes_query.filter_by(destashed_flag=True)
+
+        if tag_ids:
+            tag_ids = [int(tid) for tid in tag_ids]
+
+            if tag_logic == "and":
+                for tag_id in tag_ids:
+                    polishes_query = polishes_query.filter(Polish.tag.any(Tag.id == tag_id))
+            else:
+                polishes_query = polishes_query.filter(Polish.tag.any(Tag.id.in_(tag_ids)))
+
+        polishes = polishes_query.order_by(Polish.name).all()
+
+        # Pass data needed for filter form dropdowns
+        all_brands = Brand.query.order_by(Brand.name).all()
+        brand_names = [b.name for b in Brand.query.order_by(Brand.name).all()]
+
+        all_tags = Tag.query.order_by(Tag.name).all()
+
+        color_families = list(Polish.color_family.property.columns[0].type.enums)
+        color_families_options = Polish.color_family.property.columns[0].type.enums
+
+        polish_types = list(Polish.polish_type.property.columns[0].type.enums)
+
+        return render_template(
+            "polishes.html",
+            polishes=polishes,
+            all_brands=all_brands,
+            brand_names=brand_names,
+            all_tags=all_tags,
+            color_families=color_families,
+            color_families_options=color_families_options,
+            polish_types=polish_types,
+            request=request,
+        )
+    
     # Route for adding a new polish record
-    @app.route("/add", methods=["GET", "POST"])
-    def add():
+    @app.route("/polishes/add", methods=["GET", "POST"])
+    def add_polish():
         brands = Brand.query.order_by(Brand.name).all()
 
         # Color family labels
@@ -130,76 +195,13 @@ def create_app():
             return redirect(url_for("index"))  # return to home page
         
         return render_template(
-            "add.html", 
+            "add_polish.html", 
             brands=brands,
             color_family_labels = color_family_labels,
             polish_type_labels = polish_type_labels
-        )  # displays the add.html form
-
-    # Route for displaying all polishes and info: brand, color, etc.
-    @app.route("/polishes")
-    def view_polishes():
-        #polishes = Polish.query.order_by(Polish.name).all()
-        #return render_template("polishes.html", polishes=polishes)
+        )  # displays the add_polish.html form
     
-        polishes_query = Polish.query
-
-        # Get filter parameters
-        brand_ids = request.args.getlist("brand_id")
-        colors = request.args.getlist("color_family")
-        types = request.args.getlist("polish_type")
-        tag_ids = request.args.getlist("tag")
-        tag_logic = request.args.get("tag_logic", "or")
-        destashed_only = request.args.get("destashed")
-
-        # Apply filters dynamically
-        if brand_ids:
-            polishes_query = polishes_query.filter(Polish.brand_id.in_(brand_ids))
-
-        if colors:
-            polishes_query = polishes_query.filter(Polish.color_family.in_(colors))
-
-        if types:
-            polishes_query = polishes_query.filter(Polish.polish_type.in_(types))
-
-        if destashed_only:
-            polishes_query = polishes_query.filter_by(destashed_flag=True)
-
-        if tag_ids:
-            tag_ids = [int(tid) for tid in tag_ids]
-
-            if tag_logic == "and":
-                for tag_id in tag_ids:
-                    polishes_query = polishes_query.filter(Polish.tag.any(Tag.id == tag_id))
-            else:
-                polishes_query = polishes_query.filter(Polish.tag.any(Tag.id.in_(tag_ids)))
-
-        polishes = polishes_query.order_by(Polish.name).all()
-
-        # Pass data needed for filter form dropdowns
-        all_brands = Brand.query.order_by(Brand.name).all()
-        brand_names = [b.name for b in Brand.query.order_by(Brand.name).all()]
-
-        all_tags = Tag.query.order_by(Tag.name).all()
-
-        color_families = list(Polish.color_family.property.columns[0].type.enums)
-        color_families_options = Polish.color_family.property.columns[0].type.enums
-
-        polish_types = list(Polish.polish_type.property.columns[0].type.enums)
-
-        return render_template(
-            "polishes.html",
-            polishes=polishes,
-            all_brands=all_brands,
-            brand_names=brand_names,
-            all_tags=all_tags,
-            color_families=color_families,
-            color_families_options=color_families_options,
-            polish_types=polish_types,
-            request=request,
-        )
-    
-    # route for handling in-line updates
+    # Route for handling in-line updates
     @app.route("/update_polish_field", methods=["POST"])
     def update_polish_field():
         data = request.get_json()
@@ -233,104 +235,93 @@ def create_app():
         mani_logs = ManiLog.query.order_by(ManiLog.mani_date.desc()).all()
         return render_template("mani_logs.html", mani_logs=mani_logs)
 
-    # # Route for adding new mani log
-    # # Route for adding a new polish record
-    # @app.route("/manis/add", methods=["GET", "POST"])
-    # def add():
-    #     brands = Brand.query.order_by(Brand.name).all()
+    # Route for adding new mani log
+    @app.route("/manis/add", methods=["GET", "POST"])
+    def add_mani():
+        if request.method == "POST":  # when user submits the form:
+            # extract date
+            date_str = request.form["date"]
+            mani_date = datetime.strptime(date_str, "%Y-%m-%d").date() 
 
-    #     # Color family labels
-    #     color_family_labels = {
-    #         "clear/white": "Clear / White",
-    #         "black": "Black",
-    #         "grey/silver": "Grey / Silver",
-    #         "nude/gold/brown": "Nude / Gold / Brown",
-    #         "red": "Red",
-    #         "coral/orange": "Coral / Orange",
-    #         "yellow": "Yellow",
-    #         "green": "Green",
-    #         "teal/turq/aqua": "Teal / Turquoise / Aqua",
-    #         "blue": "Blue",
-    #         "indigo": "Indigo",
-    #         "violet": "Violet",
-    #         "fuchsia": "Fuchsia",
-    #         "pink": "Pink",
-    #         "base/top coat": "Base / Top Coat"
-    #     }
+            # extract polishes used
+            polishes_json = request.form.get("polishes_used", "[]")
+            try:
+                selected_polishes = json.loads(polishes_json)
+                polish_ids = [int(item["value"]) for item in selected_polishes]
+            except (ValueError, KeyError, TypeError):
+                polish_ids = []
+            
+            polishes_used = Polish.query.filter(Polish.id.in_(polish_ids)).all()
 
-    #     polish_type_labels = {
-    #         "color": "Color",
-    #         "top coat": "Top Coat",
-    #         "base coat": "Base Coat",
-    #         "stamping polish": "Stamping Polish",
-    #         "other": "Other"
-    #     }
+            # extract tags 
+            tags_json = request.form.get("tags", "[]")
+            try:
+                selected_tags = json.loads(tags_json)
+                tag_names = [item["value"].strip().lower() for item in selected_tags]
+            except (ValueError, KeyError, TypeError):
+                tag_names = []
+            #tag_names = json.loads(tag_raw)
+            #tag_names = [t.strip().lower() for t in tag_names if t.strip()] 
+            
+            tags = []
 
-    #     if request.method == "POST":  # when user submits the form:
-    #         name = request.form["name"].strip()  # extract polish name
+            for tag_name in tag_names:
+                tag = Tag.query.filter_by(name=tag_name).first() # check if this tag already exists in the Tag table
+                if not tag: # if it doesn't exist yet
+                    tag = Tag(name=tag_name) # stage a new record in Tag table
+                    db.session.add(tag) # add new Tag record
+                tags.append(tag) # add existing Tag name to mani_logs.tags
 
-    #         # brand
-    #         selected_brand = request.form["brand"]
-    #         new_brand_input = request.form.get("new_brand", "").strip()
+            # check if a ManiLog record exists for this date already 
+            existing = ManiLog.query.filter_by(mani_date=mani_date).first()
 
-    #         if selected_brand == "new" and new_brand_input:
-    #             brand = Brand.query.filter_by(name=new_brand_input).first()
-    #             if not brand:
-    #                 brand = Brand(name=new_brand_input, type="unknown")
-    #                 db.session.add(brand)
-    #                 db.session.commit()
-    #         else:
-    #             brand = Brand.query.filter_by(id=int(selected_brand)).first()
+            if not existing:
+                new_mani = ManiLog( # create new ManiLog record
+                    mani_date=mani_date, 
+                    polish=polishes_used,
+                    tag=tags
+                )  
+                db.session.add(new_mani)  # save to ManiLogs table
+                db.session.commit()
+                flash(f"Manicure Log added for {new_mani.mani_date}", "success")
+            #else: # add logic here so that I check whether the mani record on that date includes the same polishes; 
+                #if not, log a new ManiLog on the same date (different ID)
 
-    #         if not brand:
-    #             flash("Brand could not be determined.", "error")
-    #             return redirect(url_for("add_polish"))
-
-    #         color_family = request.form.get("color_family") # extract color
-    #         if color_family == "":
-    #             color_family = None
-
-    #         full_desc = request.form.get("full_desc", "").strip() # extract description
-
-    #         polish_type = request.form["polish_type"] # extract polish type
-
-    #         # extract tags
-    #         tag_names = request.form.get("tags", "").split(",")
-    #         tag_names = [t.strip().lower() for t in tag_names if t.strip()] #
-    #         tags = []
-
-    #         for tag_name in tag_names:
-    #             tag = Tag.query.filter_by(name=tag_name).first()
-    #             if not tag:
-    #                 tag = Tag(name=tag_name)
-    #                 db.session.add(tag)
-    #             tags.append(tag)
-
-    #         # check if polish exists for this brand 
-    #         existing = Polish.query.filter_by(name=name, brand_id=brand.id).first()
-
-    #         if not existing:
-    #             new_polish = Polish( # create new record
-    #                 name=name, 
-    #                 polish_type=polish_type,
-    #                 brand_id=brand.id, 
-    #                 color_family=color_family, 
-    #                 full_desc=full_desc,
-    #                 tag=tags
-    #             )  
-    #             db.session.add(new_polish)  # save to table
-    #             db.session.commit()
-    #             flash(f"Polish added: {new_polish.name} by {brand.name}", "success")
-
-    #         return redirect(url_for("index"))  # return to home page
+            return redirect(url_for("mani_logs"))  # return to list of mani logs 
         
-    #     return render_template(
-    #         "add.html", 
-    #         brands=brands,
-    #         color_family_labels = color_family_labels,
-    #         polish_type_labels = polish_type_labels
-    #     )  # displays the add.html form
+        return render_template("add_mani.html")  # displays the add_mani.html form, if add was unsuccessful 
 
+    # Search route for polishes
+    @app.route("/search/polishes")
+    def search_polishes():
+        query = request.args.get("q", "").strip().lower()
+
+        results = (
+            db.session.query(Polish.id, Polish.name, Brand.name)
+            .join(Brand)
+            .filter(Polish.name.ilike(f"%{query}%"))
+            .limit(10)
+            .all()
+        )
+
+        return jsonify([
+            {
+                "value": str(pid),
+                "label": f"{pname} ({bname})"
+            }
+            for pid, pname, bname in results
+        ])
+
+    # Search route for tags
+    @app.route("/search/tags")
+    def search_tags():
+        query = request.args.get("q", "").strip().lower()
+        if not query:
+            return jsonify([])
+
+        matches = Tag.query.filter(Tag.name.ilike(f"%{query}%")).order_by(Tag.name).limit(10).all()
+        return jsonify([tag.name for tag in matches])
+    
     # Route for accessing my data
     @app.route("/my_data/<path:filename>")
     def serve_my_data(filename):
