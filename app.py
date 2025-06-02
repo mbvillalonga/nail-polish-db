@@ -238,52 +238,30 @@ def create_app():
     # Route for adding new mani log
     @app.route("/manis/add", methods=["GET", "POST"])
     def add_mani():
-        # # Load all polishes for Tagify whitelist
-        # polishes = (
-        #     db.session.query(Polish.id, Polish.name, Brand.name)
-        #     .join(Brand)
-        #     .order_by(Polish.name)
-        #     .all()
-        # )
-        # polish_whitelist = [
-        #     {"value": str(pid), "label": f"{pname} ({bname})"}
-        #     for pid, pname, bname in polishes
-        # ]
 
         if request.method == "POST":  # when user submits the form:
-            # extract date
+            # extract date from form 
             date_str = request.form["date"]
             mani_date = datetime.strptime(date_str, "%Y-%m-%d").date() 
 
-            # extract polishes used
-            polishes_json = request.form.get("polishes_used", "[]")
-            try:
-                selected_polishes = json.loads(polishes_json)
-                polish_ids = [int(item["value"]) for item in selected_polishes]
-            except (ValueError, KeyError, TypeError):
-                polish_ids = []
-            
-            polishes_used = Polish.query.filter(Polish.id.in_(polish_ids)).all()
+            # extract polishes used from form       
+            polish_ids = request.form.getlist("polishes_used")     
+            polishes_used = (
+                Polish.query.filter(Polish.id.in_(polish_ids)).all()
+                if polish_ids else []
+            )
 
-            # extract tags 
-            tags_json = request.form.get("tags", "[]")
-            try:
-                selected_tags = json.loads(tags_json)
-                tag_names = [item["value"].strip().lower() for item in selected_tags]
-            except (ValueError, KeyError, TypeError):
-                tag_names = []
-            #tag_names = json.loads(tag_raw)
-            #tag_names = [t.strip().lower() for t in tag_names if t.strip()] 
-            
+            # extract tags from form 
+            tag_ids = request.form.getlist("tags")
             tags = []
-
-            for tag_name in tag_names:
-                tag = Tag.query.filter_by(name=tag_name).first() # check if this tag already exists in the Tag table
-                if not tag: # if it doesn't exist yet
-                    tag = Tag(name=tag_name) # stage a new record in Tag table
-                    db.session.add(tag) # add new Tag record
-                tags.append(tag) # add existing Tag name to mani_logs.tags
-
+            for tag_id in tag_ids:
+                tag = Tag.query.get(tag_id) # check if this tag already exists in the Tag table
+                # if not tag: # if it doesn't exist yet
+                    # tag = Tag(name=tag_name) # stage a new record in Tag table
+                    # db.session.add(tag) # add new Tag record
+                if tag:
+                    tags.append(tag)# add existing Tag name to mani_logs.tags
+                
             # check if a ManiLog record exists for this date already 
             existing = ManiLog.query.filter_by(mani_date=mani_date).first()
 
@@ -299,7 +277,7 @@ def create_app():
             #else: # add logic here so that I check whether the mani record on that date includes the same polishes; 
                 #if not, log a new ManiLog on the same date (different ID)
 
-            return redirect(url_for("mani_logs"))  # return to list of mani logs 
+            return redirect(url_for("view_mani_logs"))  # return to list of mani logs 
         
         return render_template("add_mani.html")  # displays the add_mani.html form
 
