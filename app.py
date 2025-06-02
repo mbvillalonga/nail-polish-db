@@ -238,6 +238,18 @@ def create_app():
     # Route for adding new mani log
     @app.route("/manis/add", methods=["GET", "POST"])
     def add_mani():
+        # # Load all polishes for Tagify whitelist
+        # polishes = (
+        #     db.session.query(Polish.id, Polish.name, Brand.name)
+        #     .join(Brand)
+        #     .order_by(Polish.name)
+        #     .all()
+        # )
+        # polish_whitelist = [
+        #     {"value": str(pid), "label": f"{pname} ({bname})"}
+        #     for pid, pname, bname in polishes
+        # ]
+
         if request.method == "POST":  # when user submits the form:
             # extract date
             date_str = request.form["date"]
@@ -289,7 +301,7 @@ def create_app():
 
             return redirect(url_for("mani_logs"))  # return to list of mani logs 
         
-        return render_template("add_mani.html")  # displays the add_mani.html form, if add was unsuccessful 
+        return render_template("add_mani.html")  # displays the add_mani.html form
 
     # Search route for polishes
     @app.route("/search/polishes")
@@ -319,8 +331,19 @@ def create_app():
         if not query:
             return jsonify([])
 
-        matches = Tag.query.filter(Tag.name.ilike(f"%{query}%")).order_by(Tag.name).limit(10).all()
-        return jsonify([tag.name for tag in matches])
+        results = (
+            db.session.query(Tag.id, Tag.name)
+            .filter(Tag.name.ilike(f"%{query}%"))
+            .order_by(Tag.name)
+            .limit(10)
+            .all()
+        )
+        return jsonify([
+            {
+                "value": str(tid),
+                "label": f"{tname}"
+            }
+            for tid, tname in results])
     
     # Route for accessing my data
     @app.route("/my_data/<path:filename>")

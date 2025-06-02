@@ -1,13 +1,17 @@
 <!DOCTYPE html>
 <html lang="en">
 
-<!-- 5/22/25: NOTES TO SELF ABOUT DEVELOPMENT IN COMMENTS -->
-
 <head>
     <title>Add a New Manicure Record</title>
-    <script src="https://cdn.jsdelivr.net/npm/@yaireo/tagify"></script>
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@yaireo/tagify/dist/tagify.css">
+    <!-- jQuery -->
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+
+    <!-- Select2 -->
+    <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
+
+    <!-- CSS styles -->
     <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    <link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
 </head>
 <body>
     {% with messages = get_flashed_messages(with_categories=true) %}
@@ -24,84 +28,66 @@
 
     <form method="POST"> 
         <label for="date">Date:</label><br> 
-        <input type="date" id="date" name="date" required><br><br><br> 
+        <input type="date" id="date" name="date" required>
+        <br><br><br> 
 
         <label for="polishes_used">Polish(es) used:</label><br> 
-        <input id="polishes_used" name="polishes_used" required><br><br><br>
+        <select id="polishes_used" name="polishes_used" multiple="multiple" style="width: 400px;">
+        </select>
+        <br><br><br>
 
         <label for="tags">Tags:</label><br>
-        <input id="tags" name="tags" placeholder="e.g. shimmer, flakies, jelly"><br><br><br>
+        <select id="tags" name="tags" multiple="multiple" style="width: 400px;">
+        </select>
+        <br><br><br>
 
-        <button type="submit">Add Manicure Record</button><br><br><br>
+        <button type="submit">Add Manicure Record</button>
+        <br><br><br>
     </form>
     <a href="{{ url_for('index') }}">Back to Mani Log</a>
 
-    <!-- Tagify for Polishes and Tags -->
+    <!-- Select2 JS for Polishes and Tags search -->
     <script>
-    document.addEventListener("DOMContentLoaded", function () {
-        // POLISHES
-        const polishInput = document.getElementById("polishes_used");
-
-        const polishTagify = new Tagify(polishInput, {
-            tagTextProp: "label",
-            mapValueTo: "value",
-            enforceWhitelist: false,
-            skipInvalid: true,
-            whitelist: [],
-            dropdown: {
-                enabled: 1,
-                maxItems: 10,
-                closeOnSelect: true,
-                searchKeys: ["label"]
+    $(document).ready(function() {
+        $('#polishes_used').select2({
+            ajax: { // for fetching suggestions
+                url: '/search/polishes',
+                dataType: 'json',
+                delay: 250,
+                data: function (params) {
+                    return { q: params.term }; //search term
+                },
+                processResults: function (data) {
+                    return {
+                        results: data.map(p => ({
+                            id: p.value,
+                            text: p.label
+                        }))
+                    };
+                },
+                cache: true
             },
-            templates: {
-                tag: tagData => `
-                    <tag title="${tagData.label}" contenteditable='false' class='tagify__tag'>
-                        <x title='remove tag' class='tagify__tag__removeBtn'></x>
-                        <div>
-                            <span class='tagify__tag-text'>${tagData.label}</span>
-                        </div>
-                    </tag>`,
-                dropdownItem: tagData => `
-                    <div class='tagify__dropdown__item' tabindex="0">
-                        ${tagData.label}
-                    </div>`
-            }
+            minimumInputLength: 2
         });
-
-        polishTagify.on("input", function (e) {
-            const value = e.detail.value;
-            if (!value) return;
-
-            fetch(`/search/polishes?q=${encodeURIComponent(value)}`)
-                .then(res => res.json())
-                .then(data => {
-                    polishTagify.whitelist = data;
-                    polishTagify.dropdown.show.call(polishTagify, value);
-                })
-                .catch(err => console.error("Error fetching polish list:", err));
-        });
-
-        // TAGS
-        const tagInput = document.getElementById("tags");
-        const tagTagify = new Tagify(tagInput, {
-            dropdown: {
-                maxItems: 10,
-                enabled: 1,
-                closeOnSelect: false
-            }
-        });
-
-        tagTagify.on("input", e => {
-            const value = e.detail.value;
-            if (!value) return;
-
-            fetch(`/search/tags?q=${value}`)
-                .then(res => res.json())
-                .then(data => {
-                    tagTagify.settings.whitelist = data;
-                    tagTagify.dropdown.show.call(tagTagify, value);
-                });
+        $('#tags').select2({
+            ajax: { // for fetching suggestions
+                url: '/search/tags',
+                dataType: 'json',
+                delay: 250,
+                data: function (params) {
+                    return { q: params.term }; //search term
+                },
+                processResults: function (data) {
+                    return {
+                        results: data.map(p => ({
+                            id: p.value,
+                            text: p.label
+                        }))
+                    };
+                },
+                cache: true
+            },
+            minimumInputLength: 2
         });
     });
     </script>
