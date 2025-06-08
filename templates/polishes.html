@@ -3,12 +3,11 @@
 <html lang="en">
     <head>
         <meta charset="UTF-8">
-        <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
         <title>All Polishes</title>
-        <link 
-            rel="stylesheet"
-            href="https://cdnjs.cloudflare.com/ajax/libs/lightbox2/2.11.4/css/lightbox.min.css"
-        />
+        <!-- CSS styles: -->
+        <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/lightbox2/2.11.4/css/lightbox.min.css"/>
+        <link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
     </head>
     <body>
         <h1>All Polishes</h1>
@@ -80,7 +79,7 @@
                 <td class="editable" data-id="{{ polish.id }}" data-field="color_family" data-options='{{ color_families_options | tojson | safe }}'>
                     <span class="field-value">{{ polish.color_family or "-" }}</span>
                 </td>
-                <td>
+                <td class="editable-tags" data-id="{{ polish.id }}">
                     {% for tag in polish.tag %}
                     <span class="tag-label">{{ tag.name }}</span>
                     {% else %}
@@ -205,8 +204,80 @@
             
             document.addEventListener('DOMContentLoaded', () => {
                 document.querySelectorAll('.editable').forEach(setupEditableCell);
+
+                document.querySelectorAll('.editable-tags').forEach(cell => {
+                    const polishId = cell.dataset.id;
+                    const tags = Array.from(cell.querySelectorAll('.tag-label')).map(span => span.textContent.trim());
+
+                    cell.addEventListener('dblclick', () => {
+                        const select = document.createElement('select'); // replace content with a <select multiple>
+                        select.setAttribute('multiple', 'multiple');
+                        select.classList.add('tag-editor');
+                        cell.innerHTML = '';
+                        cell.appendChild(select);
+
+                        // Initialize Select2
+                        $(select).select2({
+                            tags: true,
+                            placeholder: 'Select or create tags',
+                            ajax: {
+                                url: '/search/tags',
+                                dataType: 'json',
+                                delay: 200,
+                                data: params => ({ q: params.term }),
+                                processResults: data => ({
+                                    results: data.map(tag => ({ id: tag, text: tag}))
+                                }),
+                                cache: true
+                            },
+                            width: 'resolve'
+                        });
+
+                        // initial values
+                        tags.forEach(tag => {
+                            const option = new Option(tag, tag, true, true);
+                            option.text = tag;
+                            select.appendChild(option);
+                        });
+                        $(select).trigger('change');
+
+                        // change/lose focus
+                        const save = () => {
+                            const selectedTags = $(select).val(); // array of tag strings
+                            fetch('/update_polish_tags', {
+                                method: 'POST',
+                                headers: {'Content-Type': 'application/json' },
+                                body: JSON.stringify({ id: polishId, tags: selectedTags })
+                            })
+                            .then(res => res.json())
+                            .then(data => {
+                                if (data.success) {
+                                    cell.innerHTML = '';
+                                    if (selectedTags.length > 0) {
+                                        selectedTags.forEach(tag => {
+                                            const span = document.createElement('span');
+                                            span.className = 'tag-label';
+                                            span.textContent = tag;
+                                            cell.appendChild(span);
+                                        });
+                                    } else {
+                                        cell.innerHTML = '<em>No tags</em>';
+                                    }
+                                } else {
+                                    alert("Failed to update tags.");
+                                }
+                            });
+                        };
+
+                        select.addEventListener('change', save);
+                        select.addEventListener('blur', save);
+                    });
+                });
             });
         </script>
-            
+        <!-- jQuery: -->
+        <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+        <!-- Select2: -->
+        <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>        
     </body>
 </html>

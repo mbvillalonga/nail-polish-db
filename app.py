@@ -229,6 +229,45 @@ def create_app():
         db.session.commit()
         return jsonify({"success": True})
     
+    # Route for updating tags in-line
+    @app.route("/update_polish_tags", methods=["POST"])
+    def update_polish_tags():
+        data = request.get_json()
+        polish_id = data.get("id")
+        tag_names = data.get("tags", [])
+
+        polish = Polish.query.get(polish_id)
+        if not polish:
+            return jsonify({"success": False, "error": "Polish not found"}), 404
+        
+        # store current tags before update
+        previous_tags = set(polish.tag)
+
+        # normalize tags to lowercase
+        tag_names = list(set(t.strip().lower() for t in tag_names if t.strip()))
+
+        # create / fetch new tags
+        new_tags = []
+        for name in tag_names:
+            tag = Tag.query.filter_by(name=name).first()
+            if not tag:
+                tag = Tag(name=name)
+                db.session.add(tag)
+            new_tags.append(tag)
+        
+        # update
+        polish.tag = new_tags
+        db.session.commit()
+
+        # # identify and delete orphaned tags
+        # removed_tags = previous_tags - set(new_tags)
+        # for tag in removed_tags:
+        #    if not tag.polish: # no other polish uses this tag
+        #        db.session.delete(tag)
+        # db.session.commit()
+
+        return jsonify({"success": True})
+
     # Route for displaying mani logs
     @app.route("/manis")
     def view_mani_logs():
