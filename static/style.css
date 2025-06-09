@@ -38,18 +38,6 @@
     gap: 6px;
 }
 
-.tagify__dropdown {
-    max-width: 400px;
-    font-size: 0.95rem;
-}
-
-.tagify__dropdown__item {
-    padding: 6px 10px;
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
-}
-
-.tagify__tag-text {
-    white-space: nowrap;
+.editable-tags {
+    min-width: 400px;
 }

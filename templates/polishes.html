@@ -1,283 +1,130 @@
 <!-- templates/polishes.html -->
 <!DOCTYPE html>
 <html lang="en">
-    <head>
-        <meta charset="UTF-8">
-        <title>All Polishes</title>
-        <!-- CSS styles: -->
-        <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
-        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/lightbox2/2.11.4/css/lightbox.min.css"/>
-        <link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
-    </head>
-    <body>
-        <h1>All Polishes</h1>
-        
-        <p><a href="{{ url_for('index') }}">Back to Home</a></p>
 
-        <p><a href="{{ url_for('add_polish') }}">Add a New Polish</a></p>
+<head>
+    <meta charset="UTF-8">
+    <title>All Polishes</title>
+    <!-- CSS styles: -->
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/lightbox2/2.11.4/css/lightbox.min.css" />
+    <link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
+</head>
 
-        <form method="get">
-            <label for="brand_id">Brands:</label>
-            <select name="brand_id" multiple>
-                {% for brand in all_brands %}
-                <option value="{{ brand.id }}" {% if brand.id|string in request.args.getlist('brand_id') %}selected{% endif %}>{{ brand.name }}</option>
-                {% endfor %}
-            </select>
+<body>
+    <h1>All Polishes</h1>
 
-            <label for="color_family">Color Families:</label>
-            <select name="color_family" multiple>
-                {% for color in color_families %}
-                <option value="{{ color }}" {% if color in request.args.getlist('color_family') %}selected{% endif %}>{{ color }}</option>
-                {% endfor %}
-            </select>
+    <p><a href="{{ url_for('index') }}">Back to Home</a></p>
 
-            <label for="polish_type">Polish Types:</label>
-            <select name="polish_type" multiple>
-                {% for ptype in polish_types %}
-                <option value="{{ ptype }}" {% if ptype in request.args.getlist('polish_type') %}selected{% endif %}>{{ ptype }}</option>
-                {% endfor %}
-            </select>
+    <p><a href="{{ url_for('add_polish') }}">Add a New Polish</a></p>
 
-            <label for="tag">Tags:</label>
-            <select name="tag" multiple>
-                {% for tag in all_tags %}
-                <option value="{{ tag.id }}" {% if tag.id|string in request.args.getlist('tag') %}selected{% endif %}>{{ tag.name }}</option>
-                {% endfor %}
-            </select>
-
-            <label>Tag logic:</label>
-            <select name="tag_logic">
-                <option value="or" {% if request.args.get('tag_logic') == 'or' %}selected{% endif %}>Match any</option>
-                <option value="and" {% if request.args.get('tag_logic') == 'and' %}selected{% endif %}>Match all</option>
-            </select>
-
-            <label><input type="checkbox" name="destashed" value="1" {% if request.args.get('destashed') %}checked{% endif %}/> Show only destashed</label>
-
-            <button type="submit">Apply Filters</button>
-        </form>
-
-        <table border="1" cellpadding="8">
-            <tr>
-                <th>Name</th>
-                <th>Brand</th>
-                <th>Color</th>
-                <th>Tags</th>
-                <th>Description</th>
-                <th>Swatches</th>
-            </tr>
-            {% for polish in polishes %}
-            <tr>
-                <td class="editable" data-id="{{ polish.id }}" data-field="name">
-                    <span class="field-value">{{ polish.name }}</span>
-                    {% if polish.destashed_flag %}
-                    <span class="destash-label">Destashed</span>
-                    {% endif %}
-                </td>
-                <td class="editable" data-id="{{ polish.id }}" data-field="brand" data-options='{{ brand_names | tojson | safe}}'>
-                    <span class="field-value">{{ polish.brand.name if polish.brand else "-" }}</span>
-                </td>
-                <td class="editable" data-id="{{ polish.id }}" data-field="color_family" data-options='{{ color_families_options | tojson | safe }}'>
-                    <span class="field-value">{{ polish.color_family or "-" }}</span>
-                </td>
-                <td class="editable-tags" data-id="{{ polish.id }}">
-                    {% for tag in polish.tag %}
-                    <span class="tag-label">{{ tag.name }}</span>
-                    {% else %}
-                    <em>No tags</em>
-                    {% endfor %}
-                </td>
-                <td class="editable" data-id="{{ polish.id }}" data-field="full_desc">
-                    <span class="field-value">{{ polish.full_desc or "-" }}</span>
-                </td>
-                <td>
-                    {% if polish.swatch_photo %}
-                    <div class="swatch-gallery">
-                        {% for photo in polish.swatch_photo %}
-                        <a href="{{ url_for('serve_my_data', filename=photo.path) }}" data-lightbox="swatch-{{ polish.id }}">
-                            <img src="{{ url_for('serve_my_data', filename=photo.path) }}" class="thumbnail"/>
-                        </a>
-                        {% endfor %}
-                    </div>
-                    {% else %}
-                    <em>No swatch</em>
-                    {% endif %}
-                </td>
-            </tr>
+    <form method="get">
+        <label for="brand_id">Brands:</label>
+        <select name="brand_id" multiple>
+            {% for brand in all_brands %}
+            <option value="{{ brand.id }}" {% if brand.id|string in request.args.getlist('brand_id') %}selected{% endif
+                %}>{{ brand.name }}</option>
             {% endfor %}
-        </table>
+        </select>
 
-        <p><a href="{{ url_for('index') }}">Back to Home</a></p>
-        <script src="https://cdnjs.cloudflare.com/ajax/libs/lightbox2/2.11.4/js/lightbox-plus-jquery.min.js"></script>
+        <label for="color_family">Color Families:</label>
+        <select name="color_family" multiple>
+            {% for color in color_families %}
+            <option value="{{ color }}" {% if color in request.args.getlist('color_family') %}selected{% endif %}>{{
+                color }}</option>
+            {% endfor %}
+        </select>
 
-        <script>
-            function setupEditableCell(cell) {
-                const field = cell.dataset.field;
-                const id = cell.dataset.id;
-            
-                let options = [];
-                try {
-                    options = JSON.parse(cell.dataset.options || "[]");
-                } catch (e) {
-                    options = [];
-                }
-            
-                const createEditor = () => {
-                    const span = cell.querySelector('.field-value');
-                    const currentValue = span ? span.textContent.trim() : '';
-                    const input = document.createElement(field === 'full_desc' ? 'textarea' : 'input');
-                    input.value = currentValue;
-                    input.className = 'edit-input';
-            
-                    if (options.length > 0) {
-                        const listId = `options-${field}-${id}`;
-                        input.setAttribute('list', listId);
-            
-                        // ✅ Append datalist to <body>, not <td>
-                        if (!document.getElementById(listId)) {
-                            const datalist = document.createElement('datalist');
-                            datalist.id = listId;
-                            options.forEach(opt => {
-                                const optionElem = document.createElement('option');
-                                optionElem.value = opt;
-                                datalist.appendChild(optionElem);
-                            });
-                            document.body.appendChild(datalist);
-                        }
-                    }
-            
-                    return { input, currentValue };
-                };
-            
-                const commitChange = (input, originalValue) => {
-                    const newValue = input.value.trim();
-                    if (newValue === originalValue) {
-                        renderValue(originalValue);
-                        return;
-                    }
-            
-                    fetch(`/update_polish_field`, {
-                        method: 'POST',
-                        headers: { 'Content-Type': 'application/json' },
-                        body: JSON.stringify({ id, field, value: newValue })
-                    })
-                    .then(res => res.json())
-                    .then(data => {
-                        if (data.success) {
-                            renderValue(newValue);
-                        } else {
-                            alert('Update failed.');
-                            renderValue(originalValue);
-                        }
-                    })
-                    .catch(() => {
-                        alert('Server error.');
-                        renderValue(originalValue);
-                    });
-                };
-            
-                const renderValue = (value) => {
-                    cell.innerHTML = '';
-                    const span = document.createElement('span');
-                    span.className = 'field-value';
-                    span.textContent = value;
-                    cell.appendChild(span);
-                    setupEditableCell(cell);
-                };
-            
-                const handleDblClick = () => {
-                    const { input, currentValue } = createEditor();
-                    cell.innerHTML = '';
-                    cell.appendChild(input);
-                    input.focus();
-            
-                    input.addEventListener('blur', () => commitChange(input, currentValue));
-                    input.addEventListener('keydown', e => {
-                        if (e.key === 'Enter' && field !== 'full_desc') {
-                            e.preventDefault();
-                            input.blur();
-                        }
-                    });
-                };
-            
-                cell.addEventListener('dblclick', handleDblClick);
-            }
-            
-            document.addEventListener('DOMContentLoaded', () => {
-                document.querySelectorAll('.editable').forEach(setupEditableCell);
+        <label for="polish_type">Polish Types:</label>
+        <select name="polish_type" multiple>
+            {% for ptype in polish_types %}
+            <option value="{{ ptype }}" {% if ptype in request.args.getlist('polish_type') %}selected{% endif %}>{{
+                ptype }}</option>
+            {% endfor %}
+        </select>
 
-                document.querySelectorAll('.editable-tags').forEach(cell => {
-                    const polishId = cell.dataset.id;
-                    const tags = Array.from(cell.querySelectorAll('.tag-label')).map(span => span.textContent.trim());
+        <label for="tag">Tags:</label>
+        <select name="tag" multiple>
+            {% for tag in all_tags %}
+            <option value="{{ tag.id }}" {% if tag.id|string in request.args.getlist('tag') %}selected{% endif %}>{{
+                tag.name }}</option>
+            {% endfor %}
+        </select>
 
-                    cell.addEventListener('dblclick', () => {
-                        const select = document.createElement('select'); // replace content with a <select multiple>
-                        select.setAttribute('multiple', 'multiple');
-                        select.classList.add('tag-editor');
-                        cell.innerHTML = '';
-                        cell.appendChild(select);
+        <label>Tag logic:</label>
+        <select name="tag_logic">
+            <option value="or" {% if request.args.get('tag_logic')=='or' %}selected{% endif %}>Match any</option>
+            <option value="and" {% if request.args.get('tag_logic')=='and' %}selected{% endif %}>Match all</option>
+        </select>
 
-                        // Initialize Select2
-                        $(select).select2({
-                            tags: true,
-                            placeholder: 'Select or create tags',
-                            ajax: {
-                                url: '/search/tags',
-                                dataType: 'json',
-                                delay: 200,
-                                data: params => ({ q: params.term }),
-                                processResults: data => ({
-                                    results: data.map(tag => ({ id: tag, text: tag}))
-                                }),
-                                cache: true
-                            },
-                            width: 'resolve'
-                        });
+        <label><input type="checkbox" name="destashed" value="1" {% if request.args.get('destashed') %}checked{% endif
+                %} /> Show only destashed</label>
 
-                        // initial values
-                        tags.forEach(tag => {
-                            const option = new Option(tag, tag, true, true);
-                            option.text = tag;
-                            select.appendChild(option);
-                        });
-                        $(select).trigger('change');
+        <button type="submit">Apply Filters</button>
+    </form>
 
-                        // change/lose focus
-                        const save = () => {
-                            const selectedTags = $(select).val(); // array of tag strings
-                            fetch('/update_polish_tags', {
-                                method: 'POST',
-                                headers: {'Content-Type': 'application/json' },
-                                body: JSON.stringify({ id: polishId, tags: selectedTags })
-                            })
-                            .then(res => res.json())
-                            .then(data => {
-                                if (data.success) {
-                                    cell.innerHTML = '';
-                                    if (selectedTags.length > 0) {
-                                        selectedTags.forEach(tag => {
-                                            const span = document.createElement('span');
-                                            span.className = 'tag-label';
-                                            span.textContent = tag;
-                                            cell.appendChild(span);
-                                        });
-                                    } else {
-                                        cell.innerHTML = '<em>No tags</em>';
-                                    }
-                                } else {
-                                    alert("Failed to update tags.");
-                                }
-                            });
-                        };
+    <table border="1" cellpadding="8">
+        <tr>
+            <th>Name</th>
+            <th>Brand</th>
+            <th>Color</th>
+            <th>Tags</th>
+            <th>Description</th>
+            <th>Swatches</th>
+        </tr>
+        {% for polish in polishes %}
+        <tr>
+            <td class="editable" data-id="{{ polish.id }}" data-field="name">
+                <span class="field-value">{{ polish.name }}</span>
+                {% if polish.destashed_flag %}
+                <span class="destash-label">Destashed</span>
+                {% endif %}
+            </td>
+            <td class="editable" data-id="{{ polish.id }}" data-field="brand"
+                data-options='{{ brand_names | tojson | safe}}'>
+                <span class="field-value">{{ polish.brand.name if polish.brand else "-" }}</span>
+            </td>
+            <td class="editable" data-id="{{ polish.id }}" data-field="color_family"
+                data-options='{{ color_families_options | tojson | safe }}'>
+                <span class="field-value">{{ polish.color_family or "-" }}</span>
+            </td>
+            <td class="editable-tags" data-id="{{ polish.id }}">
+                {% for tag in polish.tag %}
+                <span class="tag-label">{{ tag.name }}</span>
+                {% else %}
+                <em>No tags</em>
+                {% endfor %}
+            </td>
+            <td class="editable" data-id="{{ polish.id }}" data-field="full_desc">
+                <span class="field-value">{{ polish.full_desc or "-" }}</span>
+            </td>
+            <td>
+                {% if polish.swatch_photo %}
+                <div class="swatch-gallery">
+                    {% for photo in polish.swatch_photo %}
+                    <a href="{{ url_for('serve_my_data', filename=photo.path) }}"
+                        data-lightbox="swatch-{{ polish.id }}">
+                        <img src="{{ url_for('serve_my_data', filename=photo.path) }}" class="thumbnail" />
+                    </a>
+                    {% endfor %}
+                </div>
+                {% else %}
+                <em>No swatch</em>
+                {% endif %}
+            </td>
+        </tr>
+        {% endfor %}
+    </table>
 
-                        select.addEventListener('change', save);
-                        select.addEventListener('blur', save);
-                    });
-                });
-            });
-        </script>
-        <!-- jQuery: -->
-        <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-        <!-- Select2: -->
-        <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>        
-    </body>
+    <p><a href="{{ url_for('index') }}">Back to Home</a></p>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/lightbox2/2.11.4/js/lightbox-plus-jquery.min.js"></script>
+
+    <!-- Editing polish records: -->
+    <script src="{{ url_for('static', filename='js/editable-polishes.js') }}"></script>
+    <!-- jQuery: -->
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <!-- Select2: -->
+    <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
+</body>
+
 </html>
