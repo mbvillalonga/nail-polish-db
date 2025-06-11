@@ -244,15 +244,28 @@ def create_app():
         previous_tags = set(polish.tag)
 
         # normalize tags to lowercase
-        tag_names = list(set(t.strip().lower() for t in tag_names if t.strip()))
+        # tag_names = list(set(t.strip().lower() for t in tag_names if t.strip()))
 
         # create / fetch new tags
         new_tags = []
+
         for name in tag_names:
-            tag = Tag.query.filter_by(name=name).first()
+            tag = None
+            name = name.strip()
+
+            if name.isdigit():
+                # try looking up tag by ID if this is a digit
+                tag = Tag.query.filter_by(id=int(name)).first()
+
             if not tag:
-                tag = Tag(name=name)
+                # fall back to treating it as a name (normalize to lowercase)
+                tag = Tag.query.filter_by(name=name.lower()).first()
+
+            if not tag:
+                # create new tag if it doesn't exist yet
+                tag = Tag(name=name.lower())
                 db.session.add(tag)
+                
             new_tags.append(tag)
         
         # update
@@ -319,6 +332,33 @@ def create_app():
             return redirect(url_for("view_mani_logs"))  # return to list of mani logs 
         
         return render_template("add_mani.html")  # displays the add_mani.html form
+
+    # Route for updating mani log records in-line
+    @app.route("/update_mani_record", methods=["POST"])
+    def update_polish_record():
+        data = request.get_json()
+        mani_log_id = data.get("id")
+        field = data.get("field")
+        value = data.get("value")
+
+        mani = ManiLog.query.get(mani_log_id)
+        if not mani:
+            return jsonify({'success': False, 'error': 'Mani record not found'}), 404
+
+        if field not in {"mani_date", "polish", "tag"}:
+            return jsonify({"success": False, 'error': 'Field not editable'}), 400
+        
+        if field == "mani_date":
+            from datetime import datetime
+            try:
+                value = datetime.strptime(value, '%Y-%m-%d').date()
+            except ValueError:
+                return jsonify({'success': False, 'error': 'Invalid date format'}), 400
+            
+        setattr(mani, field, value)
+        db.session.commit()
+
+        return jsonify({"success": True})
 
     # Search route for polishes
     @app.route("/search/polishes")
