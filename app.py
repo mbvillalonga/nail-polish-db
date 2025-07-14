@@ -304,15 +304,26 @@ def create_app():
             )
 
             # extract tags from form 
-            tag_ids = request.form.getlist("tags")
+            tag_names = request.form.getlist("tags")
+            print("Submitted tag values:", tag_names)
             tags = []
-            for tag_id in tag_ids:
-                tag = Tag.query.get(tag_id) # check if this tag already exists in the Tag table
-                # if not tag: # if it doesn't exist yet
-                    # tag = Tag(name=tag_name) # stage a new record in Tag table
-                    # db.session.add(tag) # add new Tag record
-                if tag:
-                    tags.append(tag)# add existing Tag name to mani_logs.tags
+
+            for tag_value in tag_names:
+                tag = None
+
+                # Try interpreting it as an existing Tag ID
+                if tag_value.isdigit():
+                    tag = Tag.query.get(int(tag_value))
+                # Otherwise, treat it as a name
+                if tag is None:
+                    tag = Tag.query.filter(db.func.lower(Tag.name) == tag_value.lower()).first()
+                
+                if tag is None: # if it doesn't exist yet, create new tag
+                    tag = Tag(name=tag_value) # stage a new record in Tag table
+                    db.session.add(tag) # add new Tag record
+                    db.session.flush() 
+
+                tags.append(tag)
                 
             # check if a ManiLog record exists for this date already 
             existing = ManiLog.query.filter_by(mani_date=mani_date).first()

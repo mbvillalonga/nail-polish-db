@@ -40,55 +40,60 @@
     </form>
     <a href="{{ url_for('view_mani_logs') }}">Back to Mani Log</a>
 
-    <!-- Select2 JS for Polishes and Tags search -->
-    <script>
-    $(document).ready(function() {
-        $('#polishes_used').select2({
-            ajax: { // for fetching suggestions
-                url: '/search/polishes',
-                dataType: 'json',
-                delay: 250,
-                data: function (params) {
-                    return { q: params.term }; //search term
-                },
-                processResults: function (data) {
-                    return {
-                        results: data.map(p => ({
-                            id: p.value,
-                            text: p.label
-                        }))
-                    };
-                },
-                cache: true
-            },
-            minimumInputLength: 2
-        });
-        $('#tags').select2({
-            ajax: { // for fetching suggestions
-                url: '/search/tags',
-                dataType: 'json',
-                delay: 250,
-                data: function (params) {
-                    return { q: params.term }; //search term
-                },
-                processResults: function (data) {
-                    return {
-                        results: data.map(p => ({
-                            id: p.value,
-                            text: p.label
-                        }))
-                    };
-                },
-                cache: true
-            },
-            minimumInputLength: 2
-        });
-    });
-    </script>
     <!-- jQuery -->
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 
     <!-- Select2 -->
     <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
+
+    <!-- Select2 JS for Polishes and Tags search -->
+    <script>
+    $(document).ready(function() {
+        $('#polishes_used').select2({ // for polishes used field
+            ajax: { // for fetching suggestions
+                url: '/search/polishes',
+                dataType: 'json',
+                delay: 250,
+                data: function (params) {
+                    return { q: params.term }; // search term
+                },
+                processResults: function (data) {
+                    return {
+                        results: data.map(p => ({
+                            id: p.value,
+                            text: p.label
+                        }))
+                    };
+                },
+                cache: true
+            },
+            minimumInputLength: 2,
+            width: '75%'
+        });
+
+        $('#tags').select2({ // for tags field
+            tags: true, // enables free text responses
+            ajax: { 
+                url: '/search/tags',
+                dataType: 'json',
+                delay: 250,
+                data: function (params) {
+                    return { q: params.term }; 
+                },
+                processResults: function (data) {
+                    return {
+                        results: data.map(p => ({
+                            id: p.value,
+                            text: p.label
+                        }))
+                    };
+                },
+                cache: true
+            },
+            minimumInputLength: 2,
+            width: '75%'
+        });
+    });
+    </script>
 </body>
 </html>
