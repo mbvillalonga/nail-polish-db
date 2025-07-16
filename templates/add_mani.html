@@ -26,8 +26,9 @@
         <br><br><br> 
 
         <label for="polishes_used">Polish(es) used:</label><br> 
-        <select id="polishes_used" name="polishes_used" multiple="multiple" style="width: 400px;">
+        <select id="polishes_used" multiple="multiple" style="width: 400px;">
         </select>
+        <div id="polish-details"></div>
         <br><br><br>
 
         <label for="tags">Tags:</label><br>
@@ -70,6 +71,43 @@
             minimumInputLength: 2,
             width: '75%'
         });
+
+        // whenever a polish is selected…
+        $('#polishes_used')
+            .on('select2:select', function(e) {
+                let id   = e.params.data.id;
+                let text = e.params.data.text;
+                // build an input-block if it doesn't exist yet
+                if (!$('#detail-'+id).length) {
+                    $('#polish-details').append(`
+                        <div class="polish-detail" id="detail-${id}">
+                        <input type="hidden" name="polish_id" value="${id}">
+                        <strong>${text}</strong><br>
+                        <label>Fingers used:</label>
+                        <input type="number" name="n_fingers" min="1" max="10" style="width:4em">
+                        <label>Coats:</label>
+                        <input type="number" name="n_coats" min="1" max="5" style="width:4em">
+                        <button type="button" class="remove-detail" data-id="${id}">✕</button>
+                        <hr>
+                        </div>
+                    `);
+                }
+            })
+            // whenever a polish is un‐selected, remove its block
+            .on('select2:unselect', function(e) {
+                let id = e.params.data.id;
+                $('#detail-'+id).remove();
+            });
+
+        // also delegate click on the “✕” button
+        $('#polish-details').on('click', '.remove-detail', function(){
+            let id = $(this).data('id');
+            // remove from both the detail div and from the Select2 selection:
+            $('#detail-'+id).remove();
+            let vals = $('#polishes_used').val().filter(v=> v!=id);
+            $('#polishes_used').val(vals).trigger('change');
+        });
+
 
         $('#tags').select2({ // for tags field
             tags: true, // enables free text responses

@@ -11,6 +11,16 @@
         />
     </head>
     <body>
+        {% with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}
+            <ul class="flashes">
+        {% for category, message in messages %}
+            <li class="{{ category }}">{{ message }}</li>
+        {% endfor %}
+            </ul>
+        {% endif %}
+        {% endwith %}
+
         <h1>All Manicures</h1>
         
         <p><a href="{{ url_for('add_mani') }}">Add a New Manicure Record</a> | <a href="{{ url_for('index') }}">Back to Home</a></p>
@@ -63,7 +73,7 @@
             <tr>
                 <td>{{ mani_log.mani_date }}</td>
                 <td>
-                    {% set polishes = mani_log.polish.all() %}
+                    {% set polishes = mani_log.polish %}
                     {% if polishes %}
                         {% for polish in polishes %}
                             {{ polish.name }}{% if not loop.last %}, {% endif %}

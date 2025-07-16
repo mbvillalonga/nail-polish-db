@@ -1,6 +1,7 @@
 from flask_sqlalchemy import SQLAlchemy
 from flask_migrate import Migrate
 from sqlalchemy.orm import DeclarativeBase, relationship
+from sqlalchemy.ext.associationproxy import association_proxy
 
 # pass subclass of DeclarativeBase
 class Base(DeclarativeBase):
@@ -31,13 +32,24 @@ polishes_mani_photos = db.Table(
 )
 
 # `polishes` to `mani_logs`
-polishes_mani_logs = db.Table(
-    "polishes_mani_logs",
-    db.Column("polish_id", db.Integer, db.ForeignKey("polishes.id"), primary_key=True),
-    db.Column(
-        "mani_log_id", db.Integer, db.ForeignKey("mani_logs.id"), primary_key=True
-    ),
-)
+# polishes_mani_logs = db.Table(
+#    "polishes_mani_logs",
+#    db.Column("polish_id", db.Integer, db.ForeignKey("polishes.id"), primary_key=True),
+#    db.Column(
+#        "mani_log_id", db.Integer, db.ForeignKey("mani_logs.id"), primary_key=True
+#    ),
+#)
+class PolishManiLog(db.Model):
+	__tablename__ = "polishes_mani_logs"
+	
+	polish_id = db.Column(db.Integer, db.ForeignKey("polishes.id"), primary_key=True)
+	mani_log_id = db.Column(db.Integer, db.ForeignKey("mani_logs.id"), primary_key=True)
+	
+	n_fingers = db.Column(db.Integer) # number of fingers the polish was used on
+	n_coats = db.Column(db.Integer) # number of coats used
+	
+	polish = relationship("Polish", back_populates="mani_associations")
+	mani_log = relationship("ManiLog", back_populates="polish_associations")
 
 # `polishes` to `tags`
 polishes_tags = db.Table(
@@ -191,12 +203,16 @@ class Polish(db.Model):
         lazy="dynamic",
     )
     # Polishes to mani logs: many-to-many
-    mani_log = relationship(
-        "ManiLog",
-        secondary=polishes_mani_logs,
-        back_populates="polish",
-        lazy="dynamic",
+    #mani_log = relationship(
+    #    "ManiLog",
+    #    secondary=polishes_mani_logs,
+    #    back_populates="polish",
+    #    lazy="dynamic",
+    #)
+    mani_associations = relationship(
+        "PolishManiLog", back_populates="polish", cascade="all, delete-orphan"
     )
+    mani_log = association_proxy("mani_associations", "mani_log")
 
     # Polishes to tags: many-to-many
     tag = relationship(
@@ -301,13 +317,20 @@ class ManiLog(db.Model):
     # Relationships
     # mani_logs to mani_photos: one-to-many (parent)
     mani_photo = relationship("ManiPhoto", back_populates="mani_log")
+
     # mani_logs to polishes: many-to-many
-    polish = relationship(
-        "Polish",
-        secondary=polishes_mani_logs,
-        back_populates="mani_log",
-        lazy="dynamic",
-    )
+    #polish = relationship(
+    #    "Polish",
+    #    secondary=polishes_mani_logs,
+    #    back_populates="mani_log",
+    #    lazy="dynamic",
+    #)
+	# Mani logs to polishes: many-to-many
+    polish_associations = relationship(
+		"PolishManiLog", back_populates="mani_log", cascade="all, delete-orphan"
+	)
+    polish = association_proxy("polish_associations", "polish")
+
     # mani_logs to tags: many-to-many
         # tags to mani_logs: many-to-many
     tag = db.relationship(

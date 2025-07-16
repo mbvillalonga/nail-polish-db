@@ -1,5 +1,5 @@
 from flask import Flask, render_template, request, redirect, url_for, flash, send_from_directory, jsonify
-from models import db, migrate, Polish, Brand, Tag, ManiLog
+from models import db, migrate, Polish, Brand, Tag, ManiLog, PolishManiLog
 from dotenv import load_dotenv
 from sqlalchemy import func
 from datetime import datetime
@@ -296,13 +296,6 @@ def create_app():
             date_str = request.form["date"]
             mani_date = datetime.strptime(date_str, "%Y-%m-%d").date() 
 
-            # extract polishes used from form       
-            polish_ids = request.form.getlist("polishes_used")     
-            polishes_used = (
-                Polish.query.filter(Polish.id.in_(polish_ids)).all()
-                if polish_ids else []
-            )
-
             # extract tags from form 
             tag_names = request.form.getlist("tags")
             print("Submitted tag values:", tag_names)
@@ -327,22 +320,39 @@ def create_app():
                 
             # check if a ManiLog record exists for this date already 
             existing = ManiLog.query.filter_by(mani_date=mani_date).first()
+            if existing:
+                flash(f"A manicure for {mani_date} already exists.", "warning")
+                return redirect(url_for("view_mani_logs"))
+            
+            # If ManiLog record does NOT exist for this date already:
+            # 1) create the ManiLog record (sans polishes)
+            new_mani = ManiLog(mani_date=mani_date, tag=tags)
+            db.session.add(new_mani)
+            db.session.flush()   # so new_mani.id is available
 
-            if not existing:
-                new_mani = ManiLog( # create new ManiLog record
-                    mani_date=mani_date, 
-                    polish=polishes_used,
-                    tag=tags
-                )  
-                db.session.add(new_mani)  # save to ManiLogs table
-                db.session.commit()
-                flash(f"Manicure Log added for {new_mani.mani_date}", "success")
-            #else: # add logic here so that I check whether the mani record on that date includes the same polishes; 
-                #if not, log a new ManiLog on the same date (different ID)
+            # 2) pull the three parallel arrays from the form
+            polish_ids = request.form.getlist("polish_id")
+            fingers_list = request.form.getlist("n_fingers")
+            coats_list = request.form.getlist("n_coats")
 
+            # 3) loop & create one PolishManiLog per selection
+            for pid, nf, nc in zip(polish_ids, fingers_list, coats_list):
+                pm = PolishManiLog(
+                    polish_id = int(pid),
+                    mani_log_id = new_mani.id,
+                    n_fingers = int(nf) if nf else None,
+                    n_coats   = int(nc) if nc else None
+                )
+                db.session.add(pm)
+
+            db.session.commit()
+            flash(f"Manicure Log added for {new_mani.mani_date}", "success")
             return redirect(url_for("view_mani_logs"))  # return to list of mani logs 
         
+        # GET
         return render_template("add_mani.html")  # displays the add_mani.html form
+        
+        
 
     # Route for updating mani log records in-line
     @app.route("/update_mani_record", methods=["POST"])
