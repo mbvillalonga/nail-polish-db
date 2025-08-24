@@ -125,18 +125,21 @@ nail-polish-db/
   - Uses Select2 for autocomplete drop-down multi-select for polishes and tags
   - Can create a new tag with the Select2 drop-down as well
   - Added input fields for number of fingers and coats for each selected polish
+- CRU of CRUD for `mani_photos`
+  - Updated and renamed `import_swatch_photos.py` to `import_bulk_photos.py`
+    - Script now takes arguments --file (full path to import list csv), --type (mani or polish), and -n (dry run - doesn't commit to database)
+  - Running `import_bulk_photos.py` with `--type mani` will add mani photo paths to `nail_db.mani_photos` and link photo record to related record in `nail_db.mani_logs`
 
 #### In Progress
 
 - Full CRUD for `mani_logs` record creation
-  - Future enhancements will include photo support
+  - Future enhancements will include photo support (option to upload photos with an individual mani log record rather than in bulk)
 
 - CRUD for image uploads (*e.g.*, item photos, usage photos)
   - Users will be able to upload images for each item (polish) or usage record (manicure) when creating record using Add form
   - Add form will create image directory and rename uploaded file(s) using database identifier(s)
   - Interface will support in-line uploading, if user wants to upload image after parent record creation
   - Image upload will create thumbnails for faster loading on main pages, reserving full-size for lightbox viewing
-  - Will include optional scripts for bulk upload
 
 #### Planned
 
