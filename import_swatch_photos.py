@@ -5,6 +5,13 @@ import sys
 from models import db, Polish, SwatchPhoto
 from app import create_app
 
+# bash for generating list of paths of recently uploaded photos:
+    # cd my_data/
+    # echo "path" > swatch_photo_paths_081625.csv
+    # find photos -type f -name "*.jpg" -newermt "2025-08-01" -print >> swatch_photo_paths_081625.csv
+    # open swatch_photo_paths_081625.csv
+# then return to nail-polish-db dir and run this file with --dry-run to test
+
 def extract_polish_id(filepath):
     filename = os.path.basename(filepath)
     parts = filename.split('_')

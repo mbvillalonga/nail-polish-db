@@ -110,6 +110,7 @@ class Brand(db.Model):
         )
     )
     website_url = db.Column(db.String(255))  # optional field for later
+    abbrev = db.Column(db.String(20), nullable=True)
 
     # Relationships
     # Brand to polish: one-to-many (parent)

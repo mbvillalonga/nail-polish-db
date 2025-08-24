@@ -33,6 +33,13 @@ def create_app():
     db.init_app(app)
     migrate.init_app(app, db)
 
+    # To apply changes to models.py that add or remove a field from table(s)
+    # and use flask-migrate to control the alembic version, in terminal run:
+    # # flask db migrate -m "Describe your updates inside these quotes"
+    # Then check the migrations/versions/ folder for a new file describing
+    # the changes. If all looks good, run:
+    # # flask db upgrade
+
     # Home route for landing page
     @app.route("/")
     def index():
