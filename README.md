@@ -119,14 +119,16 @@ nail-polish-db/
 - Bulk import of swatch photo import with CSV-based path mapping
 - Display thumbnails and lightbox views for swatches
 - ManiLog table with date + polish associations
-- Filtering by brand, color family, type, tag, and destashed flag
+- Filtering by brand, color family, type, tag, and destashed flag in `polishes.html`
+- CR of CRUD for `mani_logs`
+  - `add_mani.html`: allows user to log a new manicure
+  - Uses Select2 for autocomplete drop-down multi-select for polishes and tags
+  - Can create a new tag with the Select2 drop-down as well
+  - Added input fields for number of fingers and coats for each selected polish
 
 #### In Progress
 
 - Full CRUD for `mani_logs` record creation
-  - Users will be able to log a new manicure by selecting a date, one or more polishes, and one or more tags
-  - Interface will support multi-polish selection, multi-tag selection
-  - Users will also have the option to create new tags and add them to the current manicure record
   - Future enhancements will include photo support
 
 - CRUD for image uploads (*e.g.*, item photos, usage photos)
@@ -134,10 +136,11 @@ nail-polish-db/
   - Add form will create image directory and rename uploaded file(s) using database identifier(s)
   - Interface will support in-line uploading, if user wants to upload image after parent record creation
   - Image upload will create thumbnails for faster loading on main pages, reserving full-size for lightbox viewing
+  - Will include optional scripts for bulk upload
 
 #### Planned
 
-- Add optional photo upload field to `add.html`
+- Add optional photo upload fields to `add_polish.html` and `add_mani.html`
 - Inline editing for `polish_type` (`polishes.html`, `app.py`)
 - Tag adding/editing with multi-select support (`polishes.html`, `add.html`, `mani_logs.html`, `add_mani.html`)
 - Collection stats/dashboard view (most-used tags, polish type breakdown, etc.)
