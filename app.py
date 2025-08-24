@@ -1,10 +1,10 @@
-from flask import Flask, render_template, request, redirect, url_for, flash, send_from_directory, jsonify
+from flask import Flask, render_template, request, redirect, url_for, flash, jsonify#, send_from_directory 
 from models import db, migrate, Polish, Brand, Tag, ManiLog, PolishManiLog
 from dotenv import load_dotenv
 from sqlalchemy import func
 from datetime import datetime
 import os
-import json
+#import json
 
 """
 app.py
@@ -29,6 +29,7 @@ def create_app():
         f"mysql+mysqlconnector://{DB_USER}:{DB_PASSWORD}@{DB_HOST}/{DB_NAME}"
     )
     app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
+    app.config['UPLOAD_FOLDER'] = os.path.join(app.root_path, 'static', 'uploads')
 
     db.init_app(app)
     migrate.init_app(app, db)
@@ -248,7 +249,7 @@ def create_app():
             return jsonify({"success": False, "error": "Polish not found"}), 404
         
         # store current tags before update
-        previous_tags = set(polish.tag)
+        # previous_tags = set(polish.tag)
 
         # normalize tags to lowercase
         # tag_names = list(set(t.strip().lower() for t in tag_names if t.strip()))
@@ -430,10 +431,10 @@ def create_app():
             }
             for tid, tname in results])
     
-    # Route for accessing my data
-    @app.route("/my_data/<path:filename>")
-    def serve_my_data(filename):
-        return send_from_directory("my_data", filename)
+    # # Route for accessing my data (from when I was using a custom route for uploads)
+    # @app.route("/my_data/<path:filename>")
+    # def serve_my_data(filename):
+    #     return send_from_directory("my_data", filename)
 
     return app
 

@@ -21,6 +21,8 @@ backup.sql
 *.db
 my_data/
 worklog.md
+static/uploads/*
+!static/uploads/.gitkeep
 
 # Ignore .DS_Store
 .DS_Store

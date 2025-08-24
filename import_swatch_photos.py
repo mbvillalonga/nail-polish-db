@@ -1,6 +1,6 @@
 import csv
 import os
-import re
+# import re
 import sys
 from models import db, Polish, SwatchPhoto
 from app import create_app

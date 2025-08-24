@@ -102,9 +102,9 @@
                 {% if polish.swatch_photo %}
                 <div class="swatch-gallery">
                     {% for photo in polish.swatch_photo %}
-                    <a href="{{ url_for('serve_my_data', filename=photo.path) }}"
+                    <a href="{{ url_for('static', filename='uploads/' ~ photo.path) }}"
                         data-lightbox="swatch-{{ polish.id }}">
-                        <img src="{{ url_for('serve_my_data', filename=photo.path) }}" class="thumbnail" />
+                        <img src="{{ url_for('static', filename='uploads/' ~ photo.path) }}" class="thumbnail" />
                     </a>
                     {% endfor %}
                 </div>
