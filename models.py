@@ -2,6 +2,7 @@ from flask_sqlalchemy import SQLAlchemy
 from flask_migrate import Migrate
 from sqlalchemy.orm import DeclarativeBase, relationship
 from sqlalchemy.ext.associationproxy import association_proxy
+from sqlalchemy.exc import IntegrityError
 
 # pass subclass of DeclarativeBase
 class Base(DeclarativeBase):
