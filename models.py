@@ -51,6 +51,36 @@ class PolishManiLog(db.Model):
 	polish = relationship("Polish", back_populates="mani_associations")
 	mani_log = relationship("ManiLog", back_populates="polish_associations")
 
+class SimilarTo(db.Model):
+    __tablename__ = "similar_to"
+
+    polish_1_id = db.Column(
+        db.Integer,
+        db.ForeignKey("polishes.id", ondelete="CASCADE"),
+        primary_key=True,
+    )
+    polish_2_id = db.Column(
+        db.Integer,
+        db.ForeignKey("polishes.id", ondelete="CASCADE"),
+        primary_key=True,
+    )
+
+    # rank = db.Column(db.Integer, nullable=True) # to implement later: ranking of similarity structure
+
+    __table_args__ = (
+        db.CheckConstraint("polish_1_id <> polish_2_id", name="ck_similar_not_self"),
+        db.CheckConstraint(
+            "polish_1_id < polish_2_id", name="ck_similar_canonical_order"
+        ),
+    )
+
+    polish_1 = relationship(
+        "Polish", foreign_keys=[polish_1_id], back_populates="similarity_links_1"
+    )
+    polish_2 = relationship(
+        "Polish", foreign_keys=[polish_2_id], back_populates="similarity_links_2"
+    )
+
 # `polishes` to `tags`
 polishes_tags = db.Table(
     "polishes_tags",
@@ -223,7 +253,79 @@ class Polish(db.Model):
         lazy="dynamic"
     )
 
+    # similarity self-referential relationship:
+    similarity_links_1 = relationship(
+        "SimilarTo",
+        foreign_keys=[SimilarTo.polish_1_id],
+        back_populates="polish_1",
+        cascade="all, delete",
+        passive_deletes=True,
+        lazy="selectin",
+    )
 
+    # links where I'm the larger id in the pair
+    similarity_links_2 = relationship(
+        "SimilarTo",
+        foreign_keys=[SimilarTo.polish_2_id],
+        back_populates="polish_2",
+        cascade="all, delete",
+        passive_deletes=True,
+        lazy="selectin",
+    )
+
+    @property
+    def similarity_links(self):
+        """All SimilarTo edges touching this polish."""
+        return self.similarity_links_1 + self.similarity_links_2
+
+    @property
+    def similar_polishes(self):
+        """All neighboring Polish objects (undirected), deduped."""
+        neighbors = []
+        for link in self.similarity_links_1:
+            if link.polish_2 is not None:
+                neighbors.append(link.polish_2)
+        for link in self.similarity_links_2:
+            if link.polish_1 is not None:
+                neighbors.append(link.polish_1)
+        return list({p.polish_id: p for p in neighbors}.values())
+
+    def set_similarity(self, other):
+        if self.id is None or other.id is None:
+            raise ValueError("Both polishes must be committed before linking.")
+        if self.id == other.id:
+            raise ValueError("Cannot link a polish to itself.")
+
+        a, b = sorted((self.id, other.id))
+
+        # link.rank = rank # to add later
+
+        link = db.session.get(SimilarTo, (a, b))
+        if link is None:
+            link = SimilarTo(polish_1_id=a, polish_2_id=b)
+            db.session.add(link)
+            try:
+                db.session.flush()
+            except IntegrityError:
+                db.session.rollback()
+                link = db.session.get(SimilarTo, (a, b))
+
+        return link
+
+    def remove_similarity(self, other):
+        if self.id is None or other.id is None:
+            return False
+        if self.id == other.id:
+            return False
+
+        a, b = sorted((self.id, other.id))
+        link = db.session.get(SimilarTo, (a, b))
+        if link is None:
+            return False
+
+        db.session.delete(link)
+        return True
+    
 # class: SwatchPhoto
 # creates `swatch_photos` table
 class SwatchPhoto(db.Model):
