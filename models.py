@@ -303,7 +303,7 @@ class Polish(db.Model):
 
         link = db.session.get(SimilarTo, (a, b))
         if link is None:
-            link = SimilarTo(polish_1_id=a, polish_2_id=b)
+            link = SimilarTo(polish_1_id=a, polish_2_id=b) # type: ignore
             db.session.add(link)
             try:
                 db.session.flush()
