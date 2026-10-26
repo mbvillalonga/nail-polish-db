@@ -170,6 +170,8 @@ def create_app():
 
             full_desc = request.form.get("full_desc", "").strip() # extract description
 
+            collection_name = request.form.get("collection_name", "").strip() # extract collection name
+
             polish_type = request.form["polish_type"] # extract polish type
 
             # extract tags
@@ -194,6 +196,7 @@ def create_app():
                     brand_id=brand.id, 
                     color_family=color_family, 
                     full_desc=full_desc,
+                    collection_name=collection_name,
                     tag=tags
                 )  
                 db.session.add(new_polish)  # save to table
@@ -231,7 +234,7 @@ def create_app():
         else:
             setattr(polish, field, value.strip())
 
-        if not polish or field not in {"name", "full_desc", "color_family", "brand"}:
+        if not polish or field not in {"name", "full_desc", "collection_name", "color_family", "brand"}:
             return jsonify({"success": False}), 400
         
         db.session.commit()

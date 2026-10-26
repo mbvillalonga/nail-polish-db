@@ -203,6 +203,7 @@ class Polish(db.Model):
     )
     full_desc = db.Column(db.String(400))
     destashed_flag = db.Column(db.Boolean, default=False, nullable=False)
+    collection_name = db.Column(db.String(200))
 
     # Foreign keys (to linked parent tables)
     recipe_id = db.Column(
